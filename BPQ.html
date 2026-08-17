@@ -1,0 +1,3464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<!--
+BennyPQ encryption tool
+Standalone HTML file
+
+(C) since 2026 axew3.com
+ O * - Generate PQ crypto key pairs and safely hide Private Keys.
+ P * - ML-KEM 1024 for secure key exchange and ML-DSA 87 for sender identity verification.
+ Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
+ R * - NIST 5 level encryption.
+ I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
+ G * - Version 2.0.0
+ H * - Using the compiled Noble PQ library embedded within this same file
+ T * - https://github.com/paulmillr/noble-post-quantum
+
+NOTE THAT YOU DO NOT HAVE TO USE 'FORMAT -> TABS TO SPACES' opening this file with a text editor: it can corrupt the file structure (the Noble library code)
+-->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>BennyPQ - standalone HTML/JS PQ Encryption/Decryption tool</title>
+<meta name="description" content="BennyPQ. Securing the present and the future of your secrets. Post Quantum Encryption Decryption NIST LEVEL 5 tool. Single standalone HTML file.">
+
+<meta name="msapplication-TileImage" content="data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAAKAAD/4QMqaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjUtYzAxNCA3OS4xNTE0ODEsIDIwMTMvMDMvMTMtMTI6MDk6MTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Q0VFRjhCNzBGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6Q0VFRjhCNzFGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDRUVGOEI2RUYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDRUVGOEI2RkYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pv/uAA5BZG9iZQBkwAAAAAH/2wCEABQQEBkSGScXFycyJh8mMi4mJiYmLj41NTU1NT5EQUFBQUFBREREREREREREREREREREREREREREREREREREREQBFRkZIBwgJhgYJjYmICY2RDYrKzZERERCNUJERERERERERERERERERERERERERERERERERERERERERERERERERP/AABEIABQAFAMBIgACEQEDEQH/xABxAAEAAwEAAAAAAAAAAAAAAAAAAwQFAQEAAgMAAAAAAAAAAAAAAAAAAQUCAwQQAAEDAwMFAQAAAAAAAAAAABEAAQISAwQhMUGBwUITFCMRAAECAgsBAAAAAAAAAAAAAAABAiES8BExQVGBkSIyYgMT/9oADAMBAAIRAxEAPwCvZwLLwquSkZcM6lx8axblVJ3k3DOsueRJpOx20Vm1k+Mtn5S57PSO5YkHTVmvTYNfriANu3dFCG+f3eJCLL839gzPwQxr1B1C5GgxoIREyuAliG9+Xycg9SiIrdONMgn/2Q==">
+<link rel="icon" href="data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAAKAAD/4QMqaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjUtYzAxNCA3OS4xNTE0ODEsIDIwMTMvMDMvMTMtMTI6MDk6MTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Q0VFRjhCNzBGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6Q0VFRjhCNzFGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDRUVGOEI2RUYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDRUVGOEI2RkYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pv/uAA5BZG9iZQBkwAAAAAH/2wCEABQQEBkSGScXFycyJh8mMi4mJiYmLj41NTU1NT5EQUFBQUFBREREREREREREREREREREREREREREREREREREREQBFRkZIBwgJhgYJjYmICY2RDYrKzZERERCNUJERERERERERERERERERERERERERERERERERERERERERERERERERP/AABEIABQAFAMBIgACEQEDEQH/xABxAAEAAwEAAAAAAAAAAAAAAAAAAwQFAQEAAgMAAAAAAAAAAAAAAAAAAQUCAwQQAAEDAwMFAQAAAAAAAAAAABEAAQISAwQhMUGBwUITFCMRAAECAgsBAAAAAAAAAAAAAAABAiES8BExQVGBkSIyYgMT/9oADAMBAAIRAxEAPwCvZwLLwquSkZcM6lx8axblVJ3k3DOsueRJpOx20Vm1k+Mtn5S57PSO5YkHTVmvTYNfriANu3dFCG+f3eJCLL839gzPwQxr1B1C5GgxoIREyuAliG9+Xycg9SiIrdONMgn/2Q==">
+<link rel="apple-touch-icon" href="data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAAKAAD/4QMqaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjUtYzAxNCA3OS4xNTE0ODEsIDIwMTMvMDMvMTMtMTI6MDk6MTUgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Q0VFRjhCNzBGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6Q0VFRjhCNzFGM0Y1MTFGMDhBMkY4RTdDMkJGRUZGRDIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDRUVGOEI2RUYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDRUVGOEI2RkYzRjUxMUYwOEEyRjhFN0MyQkZFRkZEMiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pv/uAA5BZG9iZQBkwAAAAAH/2wCEABQQEBkSGScXFycyJh8mMi4mJiYmLj41NTU1NT5EQUFBQUFBREREREREREREREREREREREREREREREREREREREQBFRkZIBwgJhgYJjYmICY2RDYrKzZERERCNUJERERERERERERERERERERERERERERERERERERERERERERERERERP/AABEIABQAFAMBIgACEQEDEQH/xABxAAEAAwEAAAAAAAAAAAAAAAAAAwQFAQEAAgMAAAAAAAAAAAAAAAAAAQUCAwQQAAEDAwMFAQAAAAAAAAAAABEAAQISAwQhMUGBwUITFCMRAAECAgsBAAAAAAAAAAAAAAABAiES8BExQVGBkSIyYgMT/9oADAMBAAIRAxEAPwCvZwLLwquSkZcM6lx8axblVJ3k3DOsueRJpOx20Vm1k+Mtn5S57PSO5YkHTVmvTYNfriANu3dFCG+f3eJCLL839gzPwQxr1B1C5GgxoIREyuAliG9+Xycg9SiIrdONMgn/2Q==">
+<!-- (C) 2026 axew3.com -->
+<style>
+html,body{ font-family: monospace,Verdana,Tahoma,Helvetica;
+line-height: 1.4;
+padding:0;margin:0;
+letter-spacing: -0.5px;
+font-size:1.3rem;
+}
+#wrapw3mypgp {
+ display: flex;
+ flex-direction:row;
+ max-width: 100%;
+ min-width:100%;
+ background-color:#001738; /* 000F24 */
+ color:#FFF;
+}
+
+.wrapw3mypgp {
+flex-shrink: 0;
+max-width: 100%;
+min-width:100%;
+}
+
+a, a:link, a:visited {
+  color:#0066CC;
+}
+a:focus, a:hover, a:active {
+  /*color:#884488;*/
+}
+
+.interface button {
+  background-color: #000 !important;
+  color: #FFF !important;
+  border:0px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.interface button:focus,
+.interface button:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.interface button.w3-active {
+  background-color: #0075FF !important;
+  /*color: #FFF !important;*/
+  border-bottom: 3px solid #FFF !important;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.mlkem-dsa-NOTloaded{
+
+}
+.mlkem-dsa-loaded,.mlkem-dsa-loaded-pub{
+  color:#4BEA43;
+}
+
+.copyleft{
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:center;
+  font-size:1.2rem;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+  padding:20px 30px;
+}
+.copyleft1{
+  text-align:left;
+}
+.copyleft2{
+  text-align:right;
+}
+
+.wrapGenCryptoKeys,.wrapGenCryptoMLKEMKeys{
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+}
+
+.explain{
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 50px;
+  margin-top:30px;
+}
+
+#destroySessionHybrid{
+padding:0;
+cursor:pointer;
+/*margin:0 30px 0 10px;*/
+}
+
+#w3GenCryptoKeys{
+  margin:20px;
+  padding:15px;
+  font-weight:900;
+  border:2px solid #333;
+  border-radius:8px;
+}
+.result{
+  max-width:80%;
+  overflow-x:scroll;
+  margin:20px;
+  /*background-color:#000;
+  color:#FFF;*/
+  }
+
+#w3mypgpCryptoExplain{
+  margin:10px 0 0 0;
+  padding:10px 20px;
+  background-color:#000;
+  color:#FFF;
+  font-size:1.0rem;
+}
+
+textarea{
+  width:100%;
+  min-height:200px;
+  margin:0;
+}
+
+.keysdown {
+  background-color:#3B4568;
+  border-radius:8px;
+  border:2px solid #333;
+  color: #FFFFFF;
+  /*font-size:14px;*/
+  font-weight:900;
+  padding:20px;
+  text-align:center;
+  text-decoration:none;
+  margin:20px;
+  /*min-width:130px;*/
+}
+
+.keysdown > a  {
+  color:#FFF;
+}
+
+.w3mypgp-uname-tag{
+  background-color:#191919;
+  border-radius:8px;
+  border-style:none;
+  border:2px solid #333;
+  box-sizing: border-box;
+  /*max-width:90%;*/
+  color: #FFFFFF;
+  font-size:15px;
+  font-weight:900;
+  padding: 5px 10px;
+  margin:3px 10px;
+  line-height:0;
+  cursor:pointer;
+}
+
+.w3mypqBott{
+ font-size:0.9rem;
+ background-color:#F2F2F2;
+}
+
+#save-to-wp,#w3downloadPub_MLKEMKey,#w3downloadPriv_MLKEMKey,
+#w3downloadPubPriv_MLKEMKeys,#w3downloadPub_MLDSAKey,#w3downloadPriv_MLDSAKey
+,w3downloadPubPriv_MLDSAKeys{
+  color:#FFF;
+  text-decoration: none;
+}
+
+.interface {
+  display: flex;
+  flex-direction: row;       /* Row by default */
+  flex-wrap: wrap;           /* Allowed to wrap to next line if it doesn't fit */
+  justify-content: center;    /* Center them if they wrap */
+  align-items: center;
+  width: 100%;
+  gap: 2px;                 /* Essential for vertical spacing when they wrap */
+}
+
+.interface button {
+  flex: 1 1 150px;           /* Grow, Shrink, and try to be at least 150px wide */
+  min-width: 120px;          /* Prevents buttons from getting too tiny */
+  padding: 12px;
+  font-family: monospace;
+}
+
+#generateInterface,#cryptInterface,#decryptInterface{
+  font-size:2.2rem;
+  background-color:#0075FF;
+  padding:20px;
+  color:#fff;
+  border:0px;
+  font-weight:900;
+}
+
+#wrapGGenCL{
+  text-align:center;
+  line-height:30px;
+  padding:5px;
+  margin:0 20px
+}
+
+
+.wrapEncrypt, .wrapDecrypt, #w3-search-wrapper{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  margin:0;
+  padding-bottom:4.0rem;
+}
+
+.wrapw3mypgp{
+  padding-bottom:2.0rem;
+}
+
+
+.wrap0-cryptDecryptControls{
+  display: inline-block;
+  justify-content:center;
+  align-items:center;
+  max-width:90%;
+  min-width:90%;
+  /*background-color:#FFF;*/
+  padding:0 15px 5px 15px;
+  margin:0;
+  /*font-weight:900;*/
+}
+.wrap1-cryptDecryptControls{
+ display: inline-block;
+  justify-content:center;
+  align-items:center;
+  /*margin:0;*/
+  max-width:90%;
+  min-width:90%;
+}
+
+.message-control{
+  padding:0 10px;
+}
+.ciphertext{
+  padding:0 10px;
+}
+
+#w3-user-search,#w3mlkemEncryptTxtInput,#messageCryptPass{
+ font-size:18px;
+ margin:0;
+ padding:3px;
+ /*  background-color: rgba(59, 69, 104, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); */
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+ color:#FFF;
+ border:3px solid #3B4568;
+ box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3);
+}
+
+.decryptedPanel{
+ display:inline-block;
+ width:90%;
+}
+.decrypted{
+ /*background-color:#FFF;*/
+ /*padding: 10px;*/
+ margin:20px;
+ /*border-top:5px solid #000;*/
+}
+.decrypted-value{
+ background-color:#FFF;
+ display: inline-block;
+ width:auto;
+/* font-size:2.2rem;*/
+ font-weight:400;
+ padding:10px;
+}
+
+#w3mypgp_wrapKeysDownload
+{
+  display:flex;
+  justify-content:center;
+  text-align:center;
+  align-items:center;
+  flex-direction: column;
+}
+
+#decryptLoader{
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.w3keysdown {
+  background-color:#3B4568;
+  border-radius:8px;
+  border:2px solid #333;
+  color: #FFFFFF;
+  font-size:1.6rem;
+  font-weight:900;
+  /*padding:20px;*/
+  text-decoration:none;
+  margin:20px;
+  padding:20px;
+  white-space: nowrap;
+  /*max-width:50%;*/
+}
+
+.w3keysdown > a  {
+  color:#FFF;
+  padding:20px;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  text-decoration:none;
+}
+.w3keysdown > a::-moz-focus-inner,
+.w3keysdown > a:focus::-moz-focus-inner,
+button::-moz-focus-inner, .w3keysdown > a:focus,
+.w3keysdown > a:active {
+    border: 0 !important;
+    padding: 0 !important;
+    outline: none !important;
+    text-decoration:none;
+}
+
+
+.likeButt,.buttonC,input[type=file],input[type=button], input[type=submit], input[type=reset]{
+  background-color:#3B4568;
+  border-radius:8px;
+  border-style:none;
+  border:2px solid #333;
+  box-sizing: border-box;
+  /*max-width:90%;*/
+  color: #FFFFFF;
+  font-size:1.6rem;
+  font-weight:900;
+  padding:20px;
+  text-align:center;
+  text-decoration:none;
+  /*margin:20px 0px;*/
+}
+
+.likeButt,.buttonC,input[type=file]{
+  background-color:#3B4568;
+  border-radius:8px;
+  border-style:none;
+  border:2px solid #333;
+  box-sizing: border-box;
+  max-width:90%;
+  color: #FFFFFF;
+  /*font-size:2.3rem;*/
+  font-weight:900;
+  padding:20px;
+  text-align:left;
+  text-decoration:none;
+  margin:20px 0px;
+}
+
+#w3downloadPrivate_CKeys:hover,
+#w3downloadPrivate_CKeys:focus,
+#w3downloadPublic_CKeys:hover,
+#w3downloadPublic_CKeys:focus,
+.encrypt-button:hover,
+.encrypt-button:focus
+{
+ color: #4BEA43;
+ text-decoration: none;
+}
+
+input,#w3-search-results {
+  background-color:transparent;
+  color:#FFF;
+}
+
+.likeButt,.buttonC:hover,input:hover,input:focus
+{
+ color: #4BEA43;
+ text-decoration: none;
+}
+
+a:link.likeButt,a:visited.likeButt
+{
+ color: #FFF;
+ text-decoration: none;
+}
+a:hover.likeButt
+{
+ color: #4BEA43;
+ text-decoration: none;
+}
+
+.w3cbold{
+ text-align:center;
+ font-weight:900;
+ font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+.cText{
+  font-size: 1.8rem;
+  font-weight:900;
+  padding:5px 15px;
+  color: #00d2ff;
+}
+
+.w3downloadEncryptedMsg{
+  font-size: 2.5rem;
+  font-weight:900;
+  padding:5px 15px;
+  color: #00d2ff;
+}
+
+.pText{
+ padding:10px 15px;
+}
+
+
+.cCenter{
+  text-align:center;
+  padding:15px 0 0 0;
+}
+
+.cCenterD{
+  text-align:center;
+  padding:0;
+  margin-top:10px
+}
+
+.cCenterC{
+  text-align:center;
+  padding:0;
+  /*font-size:1.8rem;*/
+}
+
+.w3highligth{
+color:#00d2ff;
+font-size:25px;
+}
+
+.kTextC{
+ padding:5px 15px;
+ background-color:#000;
+ color:#FFF;
+}
+
+.desc,.descBig{
+text-align:center;
+}
+
+.big1{
+min-width:350px;font-weight:900;
+}
+
+.backgColor1{
+  background-color:#EFEFEF;
+}
+
+.backgColor2{
+  background-color:#F2F2F2;
+  padding: 15px;
+}
+
+#w3EncryptedLoaded{
+padding:15px;
+margin:15px;
+border:2px solid #00d2ff;
+background:#000F24;
+border-radius:10px;
+display:none;
+}
+
+#w3-search-results{
+  font-size:14px;
+  width:100%;
+  max-width:100%;
+  z-index:100;
+  max-height:300px;
+  overflow-x:hidden;
+  overflow-y:hidden;
+  background:#191919;
+}
+
+#w3-selected-emails{
+  font-size:14px;
+  background:#191919;
+  max-width:90%;
+  max-height:200px;
+  overflow-x:scroll;
+  overflow-y:scroll;
+}
+
+#cinciaKeysOverlay,#btnOpenCinciaKeys{
+display:none;
+}
+
+
+#overlay-dynamic-content > h2{
+ font-size: 2.0rem;
+ padding:10px;
+ margin:0px;
+}
+
+#overlay-dynamic-content > *{
+ font-size: 1.6rem;
+ padding:10px;
+ margin:0px;
+}
+
+#process-split-btn,#process-rebuild-btn{
+	 font-size: 2.0rem;
+	 margin-bottom:15px;
+}
+
+
+summary {
+  margin:0px 15px 20px 15px;
+  background-color: #dddddd;
+  border: 1px solid #000;
+  cursor: pointer;
+  font-weight:600;
+  font-size:14px;
+}
+
+details {
+/*font-size:1.0rem;*/
+}
+
+details > summary {
+  padding: 6px;
+  background-color: #dddddd;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+details > summary {
+  background-color: #ccccff;
+}
+
+#pubKeyState, #privKeyState{
+ background-color: transparent;
+ border:5px dashed #3B4568;
+ padding:10px;
+ font-family: monospace;
+ font-size:1.4rem;
+}
+
+#wrapGenCryptoMLKEMKeys{
+  text-align:center;
+  color:#FFF;
+}
+
+#w3GenCryptoMLKEMKeysDialog{
+width:70%;
+text-align:center;
+border:2px solid #00d2ff;
+background:#000F24;
+border-radius:10px;
+color:#FFF;
+font-family: monospace;
+}
+
+#wrapGenCryptoMLKEMKeys{
+padding:10px
+}
+.w3GenCryptoMLKEMbutt > p{
+  padding:10px;
+}
+
+.w3GenCryptoMLKEMbutt{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+
+.w3GenCryptoMLKEMbutt button{
+background-color:#000;
+color:#fff;
+border-radius:8px;
+border-style:none;
+border:2px solid #333;
+box-sizing: border-box;
+padding:8px;
+font-size:15px;
+}
+
+.w3GenKeysDialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modalKeyGenClose-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color:#FFF;
+}
+
+
+#hybridDecryptResults{
+  /*padding:0 30px 30px 30px;*/
+  background-color:#001738;
+  font-size: 1.3rem;
+}
+
+.wrapKeysUploadedInfo{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:0px;
+  /*color:#000;*/
+  text-align:center;
+}
+#privKeyInfoMLKEM, #pubKeyInfoMLKEM{
+  margin:0 !important;
+  background-color:#000;
+  color:#FFF;
+  font-weight:100 !important;
+  padding:10px;
+  overflow-wrap:break-word;
+  white-space:wrap;
+  word-break:break-all;
+  width:100%;
+}
+
+#w3downloadEncryptedMsg,.decryptedFile{
+  overflow-wrap:break-word;
+  white-space:wrap;
+  word-break:break-all;
+}
+
+.centerc{
+text-align:center;
+}
+
+#save-mlkem-status{
+   padding: 0 20px;
+   text-align:center;
+}
+
+.w3Bold{
+ text-align:center;
+ font-weight:900;
+}
+
+
+/*Preloader*/
+.loader{
+    display: block;
+    /*position: relative;*/
+    height: 20px;
+    width: 140px;
+    background-image:
+    linear-gradient(#FFF 20px, transparent 0),
+    linear-gradient(#FFF 20px, transparent 0),
+    linear-gradient(#FFF 20px, transparent 0),
+    linear-gradient(#FFF 20px, transparent 0);
+    background-repeat: no-repeat;
+    background-size: 20px auto;
+    background-position: 0 0, 40px 0, 80px 0, 120px 0;
+    animation: pgfill 1s linear infinite;
+  }
+
+  @keyframes pgfill {
+    0% {   background-image: linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0); }
+    25% {   background-image: linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0); }
+    50% {   background-image: linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0); }
+    75% {   background-image: linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FFF 20px, transparent 0); }
+    100% {   background-image: linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0), linear-gradient(#FF3D00 20px, transparent 0); }
+  }
+
+/* Hide content for a screenshot or switches tabs */
+@media screen {
+ body.hidden { filter: blur(20px); opacity: 0; }
+}
+
+
+.select-display-wrapper {
+    position: relative;
+    display: none;
+    margin: 20px 0 0 0;
+    text-align:center;
+
+}
+
+#hybrid-decrypted-display-mode {
+    /*background: #0D0D0D;*/
+    /*color: #00d2ff;*/
+    color: #0D0D0D;
+    border: 2px solid #00d2ff;
+    padding: 12px 40px 12px 10px;
+    margin:0;
+    /*font-family: Verdana, 'Fira Code', monospace;*/
+    /*font-size: 1.5rem;*/
+    font-weight:900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: 'Fira Code', monospace;
+    width:90%;
+    max-width:90%;
+    text-align:center;
+
+}
+
+#hybrid-decrypted-display-mode:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    /*background: rgba(0, 40, 20, 0.9);*/
+}
+
+
+.decryptedHybridDisplay{
+  padding:10px 0px;
+}
+
+/* The Overlay: Dims the background and blurs the workspace */
+.w3mypgp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px); /* Visual lock effect */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    z-index: 2;
+}
+
+/* The Slide-Out Drawer (Hidden on the right) */
+.w3mypgp-drawer {
+    position: fixed;
+    top: 0;
+    /* Start hidden off-screen by 75% of the viewport width */
+    right: -75vw;
+    width: 75vw; /* Sets the width to exactly 3/4 of the screen */
+    height: 100vh;
+    background: #0D0D0D;
+    border-left: 2px solid #00D2ff;
+    box-shadow: 0px 0 50px rgba(0,0,0,0.9);
+    transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    padding: 50px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    color: #fff;
+}
+
+/* When active, it slides to the right edge */
+.w3mypgp-drawer.active {
+    right: 0;
+}
+
+/* Activation States */
+.w3mypgp-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+.w3mypgp-trigger {
+    position: fixed;
+    right: 28px;
+    bottom: 25px;
+    width: 100px;
+    height:100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B4568 20%, #333 100%);
+    box-shadow: 0 8px 20px rgba(51, 51, 51, 0.4);
+    border: 1px solid #D6D6D6;
+    color: #00d2ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.w3mypgp-trigger.ready svg {
+    stroke: #2ecc71; /* "Success" Green */
+    transition: stroke 0.3s ease;
+}
+
+.w3mypgp-trigger:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 25px rgba(0, 210, 255, 0.4);
+}
+
+/* Subtle pulse to show it is "ready" to preview */
+body .w3mypgp-trigger.ready {
+    animation: w3-pulse 3s infinite;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes w3-pulse {
+     0% {
+        transform: scale(1);
+        /* Inward Glow */
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7),
+                    inset 0 0 0 0 rgba(0, 255, 136, 0.5);
+    }
+    70% {
+        transform: scale(1.1);
+        /* Outward Expanding Ring */
+        box-shadow: 0 0 0 20px rgba(0, 255, 136, 0),
+                    inset 0 0 10px rgba(0, 255, 136, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0),
+                    inset 0 0 0 0 rgba(0, 255, 136, 0);
+    }
+}
+
+
+/* Mobile Safety: On small phones, 3/4 might be too thin, so we force 95% */
+@media (max-width: 768px) {
+    .w3mypgp-drawer {
+        width: 95vw;
+        right: -95vw;
+        padding: 25px;
+    }
+}
+</style>
+
+
+<script id="worker-library" type="module">
+
+  function getKeys(){
+   const mlkemKeys = ml_kem1024.keygen();
+   const seed = randomBytes(32);
+   const dsaKeys = ml_dsa87.keygen(seed);
+
+   const toHex = (u8) => Array.from(u8).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Convert to Hex
+    let pubHex = toHex(mlkemKeys.publicKey);
+    let privHex = toHex(mlkemKeys.secretKey);
+
+    let pubDsa = toHex(dsaKeys.publicKey);
+    let privDsa = toHex(dsaKeys.secretKey);
+
+    return [pubHex, privHex, pubDsa, privDsa];
+  }
+
+    // Worker listener
+    self.onmessage = function(e) {
+
+    	if( e.data === 'get_PQ_keys' ){
+    		const result = getKeys();
+    		console.log('result ',result);
+        self.postMessage(result);
+    	}
+
+    	if( e.data === 'PQ_encrypt' ){
+    		const result = kemEncrypt();
+    		//console.log('result ',result);
+        //self.postMessage(result);
+    	}
+
+    	if( e.data === 'PQ_decrypt' ){
+    		const result = kemDecrypt();
+    		//console.log('result ',result);
+        //self.postMessage(result);
+    	}
+
+
+
+    };
+
+
+</script>
+
+    <script>
+    const blobContent = document.getElementById('worker-library').textContent;
+    const blob = new Blob([blobContent], { type: 'text/javascript' });
+    const workerURL = window.URL.createObjectURL(blob);
+
+    // Init the worker
+    const myWorker = new Worker(workerURL);
+
+    myWorker.onmessage = function(e) {
+
+    // To actually "see" the keys as text (Hexadecimal), convert the bytes:
+    const publicKeyHex = Array.from(publicKey).map(b => b.toString(16).padStart(2, '0')).join('');
+
+     console.log("Public Key Hex:", publicKeyHex);
+    };
+
+    // Send data to the Noble library
+    myWorker.postMessage('get_dsa87_keys');
+</script>
+</head>
+
+<body>
+  <header style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+    width: 100%;
+    background: radial-gradient(circle at center, #001738 0%, #05070a 100%);
+    box-shadow: 0 4px 30px rgba(0, 242, 254, 0.15);
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
+    flex-direction: column;
+">
+    <h1 style="
+        font-size: clamp(2.0rem, 5vw, 3.5rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color:#FFFFFF;
+        margin: 0;">
+        Gemini BPQ v2.0.0
+    </h1>
+    <h3 style="
+        font-size: clamp(1.5rem, 2.5vw, 1.7rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color:#FFFFFF;
+        margin: 0;">Standalone HTML/JS Encryption & Decryption</h3>
+</header>
+
+<!-- (C) 2026 axew3.com -->
+<div id="wrapw3mypgp">
+  <div class="wrapw3mypgp">
+
+<div class="interface">
+  <button class="w3-active" id="cryptInterface">Encrypt</button>
+  <button id="decryptInterface">Decrypt</button>
+  <button id="generateInterface">Get keys</button>
+</div>
+
+<div id="w3mypgpCryptoExplain" class="explain">
+<div>
+&#128274; ML-KEM 1024 + AES-GCM Hybrid
+</div>
+
+<div id="destroySessionHybrid"><img style="margin:0px;width:40px; height:40px;" alt="Destroy session" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRjJCMDAiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCA0djVoLTYiLz48cGF0aCBkPSJNMjAgOWE4IDggMCAwIDAgLTE1LjUgMiIvPjxwYXRoIGQ9Ik00IDIwdi01aDYiLz48cGF0aCBkPSJNNCAxNWE4IDggMCAwIDAgMTUuNSAtMiIvPjwvc3ZnPg=="></div>
+</div>
+
+<!-- START GENERATE KEYS ML-KEM HTML -->
+
+<div id="wrapGenCryptoMLKEMKeys" class="wrapGenCryptoMLKEMKeys" style="display:none;">
+
+<button id="w3GenCryptoMLKEMKeys" class="buttonC">Generate keys</button>
+<button id="btnOpenCinciaKeys" class="buttonC" style="background-color: #0ea5e9; margin-top: 10px;">Cincia keys vault</button>
+
+<!-- CinciaKeys Overlay Screen Container - Full screen lock -->
+<div id="cinciaKeysOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(15, 23, 42, 0.98); z-index: 999999; overflow: hidden; display: flex; justify-content: center; align-items: flex-start; padding: 0;">
+
+    <!-- SCROLLABLE WRAPPER PIECE - Adjusted to be 75% wide -->
+    <div style="width: 75%; max-width: 900px; min-width: 320px; height: 100%; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 40px;">
+
+        <!-- Top Layer Header Area for the Close Button -->
+        <div style="width: 100%; display: flex; justify-content: flex-end; padding: 10px 20px; background-color: #0f172a; border-bottom: 1px solid #1e293b;">
+            <button id="btnCloseCinciaKeys" style="padding-right:40px; background: transparent; border: none; color: #94a3b8; font-size: 2.2rem; cursor: pointer; transition: color 0.2s; line-height: 1;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+        </div>
+
+        <!-- App Main Container - Responsive width matching the wrapper -->
+        <div style="width: 100%; background-color: #1e293b; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-left: 1px solid #334155; border-right: 1px solid #334155; border-bottom: 1px solid #334155; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); flex-shrink: 0;">
+
+            <!-- Tabs Header Navigation -->
+            <div style="display: flex; background-color: #0f172a; width: 100%; border-bottom: 1px solid #334155;">
+                <button id="overlay-btn-split" style="flex: 1; padding: 18px 0; font-size: 1.8rem; font-weight: 600; background-color: #0ea5e9; color: #ffffff; border: none; cursor: pointer; text-align: center;">Split</button>
+                <button id="overlay-btn-rebuild" style="flex: 1; padding: 18px 0; font-size: 1.8rem; font-weight: 600; background-color: transparent; color: #94a3b8; border: none; cursor: pointer; text-align: center;">Rebuild</button>
+            </div>
+
+            <!-- Dynamic Workspace Content Area -->
+            <div id="overlay-dynamic-content" style="padding: 30px 20px; display: flex; flex-direction: column; gap: 20px;">
+                <!-- Content gets programmatically injected here -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="save-mlkem-status"></div>
+
+</div>
+
+<div id="wrapGenCryptoKeys" class="wrapGenCryptoKeys">
+
+          <div id="wrapGGenCL" style="display:none">
+            <div style="display:inline-block;">
+             <b class="cText">...please wait</b>
+           </div>
+            <div style="display:inline-block;">
+             <div class="loader" id="loadedisplayr2"></div>
+            </div>
+          </div>
+          <div style="display:none;" id="w3mypgp_wrapKeysDownload">
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPub_MLKEMKey" download="MLKEM_Public_Key.txt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ML-KEM Public key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+           </div>
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPriv_MLKEMKey" download="MLKEM_Private_Key.txt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ML-KEM Private key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+           </div>
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPubPriv_MLKEMKeys" download="MLKEM_Public_and_Private_Key.txt">ML-KEM Public and Private key</a>
+           </div>
+           <hr style="width:40%;height:1px;">
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPub_MLDSAKey" download="MLDSA_Public_Key.txt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ML-DSA Public key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+           </div>
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPriv_MLDSAKey" download="MLDSA_Private_Key.txt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ML-DSA Private key&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+           </div>
+           <div class="w3keysdown"><a href="" target="_blank" id="w3downloadPubPriv_MLDSAKeys" download="MLDSA_Public_and_Private_Key.txt">ML-DSA Public and Private key</a>
+           </div>
+          </div>
+</div>
+<!-- END GENERATE KEYS HTML -->
+
+<div class="cCenter" id="w3loadKeys" style="display:block;"><span class="cText">Load ML-KEM key</span><br><input class="buttonC" type="file" id="myPubPrivKeyTXT" name="myPubPrivKeyTXT" accept=".txt, text/plain, image/png, image/jpeg"></div>
+
+<!-- START DECRYPT HTML ML-KEM -->
+<div id="wrapDecrypt">
+
+  <div class="cCenterD">
+
+  <div class="wrapKeysUploadedInfo">
+
+   <div style="display:none" id="w3wrapPrivKeyInfo">
+   <details>
+   <summary id="privKeyState">Private key not loaded</summary>
+   <div id="privKeyInfoMLKEM"></div>
+   </details>
+   </div>
+
+
+    <div class="cCenter"><span class="cText">Load ML-DSA Public Key</span><br>and check the file's authenticity<br>
+    <input class="buttonC" type="file" id="senderMldsaPubLoad" name="senderMldsaPubLoad" accept=".txt, text/plain, image/png, image/jpeg">
+    <br><span class="mlkem-dsa-PUBNOTloaded" id="pub-mlkem-dsa-state">Public ml-dsa sign key not loaded</span>
+    <br><br>
+    </div>
+
+
+  </div>
+
+<div>
+
+<span class="cText">Decrypt file</span><br>
+<div id="select-display-wrapper" class="select-display-wrapper">
+    <select id="hybrid-decrypted-display-mode">
+    <option value="drawer" selected>Display in Drawer (On-RAM)</option>
+    <option value="download">Download Link Only</option>
+    </select>
+</div>
+<input class="buttonC" type="file" id="mlkemCryptedFile" name="myCryptedFile">
+
+            <div id="decryptLoader">
+             <div class="loader" id="loadedisplayr2"></div>
+            </div>
+
+</div>
+
+</div>
+
+<div class="centerc decrypted" id="w3_wrap_link-decrypt-form"></div>
+
+<div class="centerc decrypted">
+   <div id="w3EncryptedLoaded">
+     <h3>Secure File Loaded</h3>
+     <p>The message is ready to be decrypted.<br>Load your Private key to proceed</p>
+     <input type="file" name="wpw3MLKEMPrivateKeyLoad" id="wpw3MLKEMPrivateKeyLoad" accept=".pem,.txt,.key,.priv" style="background:#0073aa;color:white;border:none; padding:10px 20px;cursor:pointer;border-radius:5px;">
+   </div>
+</div>
+
+    <div class="centerc" id="hybridDecryptResults" style="display:none;">
+    <p>the file was encrypted on</p>
+    <p id="mlkemEncrypionDate"></p>
+    <div id="decrypted-verified" class="decrypted-verified"></div>
+    </div>
+
+
+</div> <!-- END DECRYPT HTML ML-KEM -->
+
+<!-- START ENCRYPT HTML ML-KEM -->
+<div id="wrapEncrypt" class="wrapEncrypt">
+
+<div class="wrap0-cryptDecryptControls">
+
+<div class="wrapKeysUploadedInfo">
+
+<!-- <div style="display:none" id="w3wrapPrivKeyInfo">
+  <details>
+  <summary id="privKeyState">Private key not loaded</summary>
+  <div id="privKeyInfoMLKEM"></div>
+  </details>
+ </div>-->
+
+ <div style="" id="w3wrapPubKeyInfo">
+  <details>
+  <summary id="pubKeyState">Public key not loaded</summary>
+  <div id="pubKeyInfoMLKEM"></div>
+  </details>
+
+  <div class="cCenter"><span class="cText">Load ML-DSA Private key</span><br>and sign the encrypted file<br>
+    <input class="buttonC" type="file" id="senderMldsaPrivLoad" name="senderMldsaPrivLoad" accept=".txt, text/plain, image/png, image/jpeg">
+    <br><span class="mlkem-dsa-NOTloaded" id="priv-mlkem-dsa-state">Private ml-dsa sign key not loaded</span>
+    <br><br>
+  </div>
+
+  </div>
+
+</div>
+
+</div>
+
+  <div class="wrap1-cryptDecryptControls">
+
+  <div class="cCenter"><span class="cText">Encrypt file(s)</span><br>
+
+       <input class="buttonC" type="file" id="myFileToBeCryptedMLKEM" name="myFileToBeCryptedMLKEM" multiple>
+       <div>
+          <div id="w3LoaderEncFiles" style="display:none">
+           <div class="loader" id="loader2"></div>
+          </div>
+       </div>
+
+    <div class="w3mypgpDownEncrypted">
+      <a href="" class="keysdown likeButt" target="_blank" id="downFileEncMlkem" style="display:none" download="my_mlkem_Crypted_file.txt">Download the Encrypted file</a>
+    </div>
+
+ </div>
+            <div class="message-control">
+              <div class="w3cbold">or type text</div>
+              <textarea id="w3mlkemEncryptTxtInput" name="message" placeholder="...to be encrypted"></textarea>
+            </div>
+            <div class="ciphertext">
+
+              <div style="display:inline-block">
+              <input class="encrypt-button" type="button" value="Encrypt text">
+              </div>
+              <div style="display:inline-block;padding-left:15px;">
+                <b id="waitEncryption" class="cText" style="display:none">...please wait</b>
+              </div>
+              <div style="display:inline-block;padding-left:15px;">
+              <div class="loader" id="loader" style="display:none"></div>
+              <div id="progressBar" class="progressBar" style="display:none"><progress id="tprogress" class="tprogress" value="0" max="100">0 %</progress></div>
+              </div>
+              <br>
+              <br>
+      <div style="text-align:center">
+              <b>Encrypted file size: </b><span class="ciphertext-value"></span>
+              <br>
+              <a href="" target="_blank" id="w3downloadEncryptedMsg" class="cText w3downloadEncryptedMsg" style="font-weight:900;" download="w3mypgp_encryptedMsg.txt">Download encrypted file</a>
+              <br>
+      </div>
+            </div>
+
+
+
+    </div><!-- END wrap1-cryptDecryptControls -->
+
+</div><!-- END ENCRYPT HTML -->
+
+
+<!-- START DECRYPTED RESULTS -->
+
+<button class="w3mypgp-trigger" onclick="toggleW3Menu()">?</button>
+
+<div id="w3-overlay" class="w3mypgp-overlay" onclick="toggleW3Menu()"></div>
+<div id="w3-drawer" class="w3mypgp-drawer">
+ <button onclick="toggleW3Menu()" style="background:none; border:none; color:#FFF; font-size:50px; float:right; margin:0;padding:0; cursor:pointer;line-height:-1px">&times;</button>
+ <button class="w3mypgp-trigger" onclick="toggleW3Menu()" title="Preview Decrypted">
+  <svg viewBox="0 0 24 24" width="50" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+</button>
+    <h2 style="color:#00d2ff; margin-top:0;">Decrypted content</h2>
+
+
+    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-top:20px;">
+        <h4 style="margin:0 0 10px 0;">Hybrid Engine Active</h4>
+    </div>
+
+   <div id="preview-wrapper" style="text-align:center; padding:20px;"></div>
+
+</div><!-- END <div id="w3-drawer" -->
+
+    </div>
+</div>
+
+<script>
+/* (C) 2026 axew3.com - w3it.org */
+
+ var myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
+ var isDoingTask=fromTypedText=0;
+ var inactivityTimeout;
+ var cinciaMode='';
+
+//const INACTIVITY_LIMIT = 3 * 60 * 1000;// 3 min
+const INACTIVITY_LIMIT = 5 * 60 * 1000;// 5 min
+//const INACTIVITY_LIMIT = 10 * 60 * 1000;// 10 min
+//const INACTIVITY_LIMIT = 3600; //test
+
+
+document.getElementById('w3GenCryptoMLKEMKeys').addEventListener('click', async function() {
+    //w3genCryptoMLKEMKeys('donotsave');
+    w3mypgpEngine.getKeys();
+});
+
+  function w3mypgpcloseDialog(result) {
+    w3genCryptoMLKEMKeys(result);
+    document.getElementById('w3GenCryptoMLKEMKeysDialog').close();
+  }
+
+
+async function w3genCryptoMLKEMKeys(profileSaveYN){
+    console.log("Starting noble PQ KeyGen...");
+
+    let w = await myWorker.postMessage('get_PQ_keys');
+
+    myWorker.onmessage = function(e) {
+
+     const[pubHex, privHex, pubDsa, privDsa] = e.data;
+
+    let a = '-----BEGIN PUBLIC KEY-----'+pubHex+'-----END PUBLIC KEY----------BEGIN PRIVATE KEY-----'+privHex+'-----END PRIVATE KEY-----';
+    let aa = new Blob([a], {type: 'text/plain'});
+    let pubPrivKem = window.URL.createObjectURL(aa);
+
+    let b = '-----BEGIN PUBLIC KEY-----'+pubHex+'-----END PUBLIC KEY-----';
+    let bb = new Blob([b], {type: 'text/plain'});
+    let pubKem = window.URL.createObjectURL(bb);
+
+    let c = '-----BEGIN PRIVATE KEY-----'+privHex+'-----END PRIVATE KEY-----';
+    let cc = new Blob([c], {type: 'text/plain'});
+    let privKem = window.URL.createObjectURL(cc);
+
+    let d = '-----BEGIN PUBLIC KEY-----'+pubDsa+'-----END PUBLIC KEY----------BEGIN PRIVATE KEY-----'+privDsa+'-----END PRIVATE KEY-----';
+    let dd = new Blob([d], {type: 'text/plain'});
+    let pubPrivDsaKey = window.URL.createObjectURL(dd);
+
+    let g = '-----BEGIN PUBLIC KEY-----'+pubDsa+'-----END PUBLIC KEY-----';
+    let gg = new Blob([g], {type: 'text/plain'});
+    let pubDsaKey = window.URL.createObjectURL(gg);
+
+    let f = '-----BEGIN PRIVATE KEY-----'+privDsa+'-----END PRIVATE KEY-----';
+    let ff = new Blob([f], {type: 'text/plain'});
+    let privDsaKey = window.URL.createObjectURL(ff);
+
+    // Hybrid?? For users to be stored?
+    let kemDsa = '-----BEGIN MLKEM-PUBLIC KEY-----'+pubHex+'-----END MLKEM-PUBLIC KEY-----'+'-----BEGIN DSA-PRIVATE KEY-----'+privDsa+'-----END DSA-PRIVATE KEY-----';
+    let kd = new Blob([kemDsa], {type: 'text/plain'});
+    let privKem_PubDsa_Keys = window.URL.createObjectURL(kd);
+
+    a=b=c=d=g=f='';
+
+    const status = document.getElementById('save-mlkem-status');
+
+   document.getElementById("wrapGenCryptoKeys").setAttribute("style", "display:block;");
+   document.getElementById("w3mypgp_wrapKeysDownload").setAttribute("style", "display:flex;");
+
+   document.getElementById("w3downloadPub_MLKEMKey").setAttribute("download", '_mlkem_Public-Key.txt');
+   document.getElementById("w3downloadPub_MLKEMKey").setAttribute("href", pubKem);
+   document.getElementById("w3downloadPriv_MLKEMKey").setAttribute("download", '_mlkem_Private-Key.txt');
+   document.getElementById("w3downloadPriv_MLKEMKey").setAttribute("href", privKem);
+
+   document.getElementById("w3downloadPubPriv_MLKEMKeys").setAttribute("download", '_mlkem_Public-Private-Key.txt');
+   document.getElementById("w3downloadPubPriv_MLKEMKeys").setAttribute("href", pubPrivKem);
+
+   document.getElementById("w3downloadPub_MLDSAKey").setAttribute("download", '_mldsa_Public-Key.txt');
+   document.getElementById("w3downloadPriv_MLDSAKey").setAttribute("download", '_mldsa_Private-Key.txt');
+   document.getElementById("w3downloadPubPriv_MLDSAKeys").setAttribute("download", '_mldsa_Public-Private-Key.txt');
+
+   document.getElementById("w3downloadPub_MLDSAKey").setAttribute("href", pubDsaKey);
+   document.getElementById("w3downloadPriv_MLDSAKey").setAttribute("href", privDsaKey);
+   document.getElementById("w3downloadPubPriv_MLDSAKeys").setAttribute("href", pubPrivDsaKey);
+ };
+
+}
+
+
+
+
+
+async function get_bulk_keys(uidsAry) {
+
+try {
+        const response = await fetch(w3pgpConfig.root + 'get-bulk-keys', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': w3pgpConfig.nonce
+            },
+            body: JSON.stringify({ uidsAry: uidsAry })
+        });
+
+        const result = await response.json();
+        if (result) {
+            return result;
+        } else {
+            console.log("Error: " + result);
+        }
+    } catch (err) {
+
+        return err;
+    }
+}
+
+
+</script>
+
+<!-- END ABOUT WP USER SAVE PUBLIC KEY AND READ/DECRYPT FILES -->
+
+
+<!-- START DISPLAY DECRYPTED RESULTS -->
+
+<script>
+function toggleW3Menu() {
+    let drawer = document.getElementById('w3-drawer');
+    let overlay = document.getElementById('w3-overlay');
+    drawer.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+</script>
+
+<!-- END DISPLAY DECRYPTED RESULTS -->
+
+<!-- Worker -->
+<!-- (C) 2026 axew3.com -->
+<script id="worker-script" type="text/plain">
+/*! noble-post-quantum - MIT License (c) 2024 Paul Miller (paulmillr.com) */
+var noblePQC=(()=>{var Ye=Object.defineProperty;var sn=Object.getOwnPropertyDescriptor;var cn=Object.getOwnPropertyNames;var fn=Object.prototype.hasOwnProperty;var un=(e,n)=>{for(var t in n)Ye(e,t,{get:n[t],enumerable:!0})},ln=(e,n,t,r)=>{if(n&&typeof n=="object"||typeof n=="function")for(let o of cn(n))!fn.call(e,o)&&o!==t&&Ye(e,o,{get:()=>n[o],enumerable:!(r=sn(n,o))||r.enumerable});return e};var an=e=>ln(Ye({},"__esModule",{value:!0}),e);var Pn={};un(Pn,{ml_dsa44:()=>Jt,ml_dsa65:()=>en,ml_dsa87:()=>tn,ml_kem1024:()=>Vt,ml_kem512:()=>Xt,ml_kem768:()=>Yt,randomBytes:()=>he});var je=BigInt(4294967295),bt=BigInt(32);
+function dn(e,n=!1){return n?{h:Number(e&je),l:Number(e>>bt&je)}:{h:Number(e>>bt&je)|0,l:Number(e&je)|0}}function wt(e,n=!1){let t=e.length,r=new Uint32Array(t),o=new Uint32Array(t);for(let c=0;c<t;c++){let{h:s,l:u}=dn(e[c],n);[r[c],o[c]]=[s,u]}return[r,o]}
+var mt=(e,n,t)=>e<<t|n>>>32-t,Tt=(e,n,t)=>n<<t|e>>>32-t,Et=(e,n,t)=>n<<t-32|e>>>64-t,At=(e,n,t)=>e<<t-32|n>>>64-t;function pn(e){return e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"&&"BYTES_PER_ELEMENT"in e&&e.BYTES_PER_ELEMENT===1}function Oe(e,n=""){if(typeof e!="number"){let t=n&&`"${n}" `;throw new TypeError(`${t}expected number, got ${typeof e}`)}if(!Number.isSafeInteger(e)||e<0){let t=n&&`"${n}" `;throw new RangeError(`${t}expected integer >= 0, got ${e}`)}}function z(e,n,t=""){let r=pn(e),o=e?.length,c=n!==void 0;if(!r||c&&o!==n){let s=t&&`"${t}" `,u=c?` of length ${n}`:"",l=r?`length=${o}`:`type=${typeof e}`,w=s+"expected Uint8Array"+u+", got "+l;throw r?new RangeError(w):new TypeError(w)}return e}function Ve(e,n=!0){if(e.destroyed)throw new Error("Hash instance has been destroyed");if(n&&e.finished)throw new Error("Hash#digest() has already been called")}function Bt(e,n){z(e,void 0,"digestInto() output");let t=n.outputLen;if(e.length<t)throw new RangeError('"digestInto() output" expected to be of length >='+t)}function Ce(e){return new Uint32Array(e.buffer,e.byteOffset,Math.floor(e.byteLength/4))}function Ze(...e){for(let n=0;n<e.length;n++)e[n].fill(0)}var kt=new Uint8Array(new Uint32Array([287454020]).buffer)[0]===68;function hn(e){return e<<24&4278190080|e<<8&16711680|e>>>8&65280|e>>>24&255}function yn(e){for(let n=0;n<e.length;n++)e[n]=hn(e[n]);return e}var Ee=kt?e=>e:yn;function qe(...e){let n=0;for(let r=0;r<e.length;r++){let o=e[r];z(o),n+=o.length}let t=new Uint8Array(n);for(let r=0,o=0;r<e.length;r++){let c=e[r];t.set(c,o),o+=c.length}return t}function We(e,n={}){let t=(o,c)=>e(c).update(o).digest(),r=e(void 0);return t.outputLen=r.outputLen,t.blockLen=r.blockLen,t.canXOF=r.canXOF,t.create=o=>e(o),Object.assign(t,n),Object.freeze(t)}function Ot(e=32){Oe(e,"bytesLength");let n=typeof globalThis=="object"?globalThis.crypto:null;if(typeof n?.getRandomValues!="function")throw new Error("crypto.getRandomValues must be defined");if(e>65536)throw new RangeError(`"bytesLength" expected <= 65536, got ${e}`);return n.getRandomValues(new Uint8Array(e))}var _e=e=>({oid:Uint8Array.from([6,9,96,134,72,1,101,3,4,2,e])});var gn=BigInt(0),Le=BigInt(1),xn=BigInt(2),bn=BigInt(7),wn=BigInt(256),mn=BigInt(113),Ut=[],It=[],St=[];for(let e=0,n=Le,t=1,r=0;e<24;e++){[t,r]=[r,(2*t+3*r)%5],Ut.push(2*(5*r+t)),It.push((e+1)*(e+2)/2%64);let o=gn;for(let c=0;c<7;c++)n=(n<<Le^(n>>bn)*mn)%wn,n&xn&&(o^=Le<<(Le<<BigInt(c))-Le);St.push(o)}var Mt=wt(St,!0),Tn=Mt[0],En=Mt[1],_t=(e,n,t)=>t>32?Et(e,n,t):mt(e,n,t),Lt=(e,n,t)=>t>32?At(e,n,t):Tt(e,n,t);function An(e,n=24){if(Oe(n,"rounds"),n<1||n>24)throw new Error('"rounds" expected integer 1..24');
+let t=new Uint32Array(10);for(let r=24-n;r<24;r++){for(let s=0;s<10;s++)t[s]=e[s]^e[s+10]^e[s+20]^e[s+30]^e[s+40];for(let s=0;s<10;s+=2){let u=(s+8)%10,l=(s+2)%10,w=t[l],g=t[l+1],D=_t(w,g,1)^t[u],E=Lt(w,g,1)^t[u+1];for(let m=0;m<50;m+=10)e[s+m]^=D,e[s+m+1]^=E}let o=e[2],c=e[3];for(let s=0;s<24;s++){let u=It[s],l=_t(o,c,u),w=Lt(o,c,u),g=Ut[s];o=e[g],c=e[g+1],e[g]=l,e[g+1]=w}for(let s=0;s<50;s+=10){let u=e[s],l=e[s+1],w=e[s+2],g=e[s+3];e[s]^=~e[s+2]&e[s+4],e[s+1]^=~e[s+3]&e[s+5],e[s+2]^=~e[s+4]&e[s+6],e[s+3]^=~e[s+5]&e[s+7],e[s+4]^=~e[s+6]&e[s+8],e[s+5]^=~e[s+7]&e[s+9],e[s+6]^=~e[s+8]&u,e[s+7]^=~e[s+9]&l,e[s+8]^=~u&w,e[s+9]^=~l&g}e[0]^=Tn[r],e[1]^=En[r]}Ze(t)}var Ke=class e{state;pos=0;posOut=0;finished=!1;state32;destroyed=!1;blockLen;suffix;outputLen;canXOF;enableXOF=!1;rounds;constructor(n,t,r,o=!1,c=24){if(this.blockLen=n,this.suffix=t,this.outputLen=r,this.enableXOF=o,this.canXOF=o,this.rounds=c,Oe(r,"outputLen"),!(0<n&&n<200))throw new Error("only keccak-f1600 function is supported");this.state=new Uint8Array(200),this.state32=Ce(this.state)}clone(){return this._cloneInto()}keccak(){Ee(this.state32),An(this.state32,this.rounds),Ee(this.state32),this.posOut=0,this.pos=0}update(n){Ve(this),z(n);let{blockLen:t,state:r}=this,o=n.length;for(let c=0;c<o;){let s=Math.min(t-this.pos,o-c);for(let u=0;u<s;u++)r[this.pos++]^=n[c++];this.pos===t&&this.keccak()}return this}finish(){if(this.finished)return;this.finished=!0;let{state:n,suffix:t,pos:r,blockLen:o}=this;n[r]^=t,(t&128)!==0&&r===o-1&&this.keccak(),n[o-1]^=128,this.keccak()}writeInto(n){Ve(this,!1),z(n),this.finish();let t=this.state,{blockLen:r}=this;for(let o=0,c=n.length;o<c;){this.posOut>=r&&this.keccak();let s=Math.min(r-this.posOut,c-o);n.set(t.subarray(this.posOut,this.posOut+s),o),this.posOut+=s,o+=s}return n}xofInto(n){if(!this.enableXOF)throw new Error("XOF is not possible for this instance");return this.writeInto(n)}xof(n){return Oe(n),this.xofInto(new Uint8Array(n))}digestInto(n){if(Bt(n,this),this.finished)throw new Error("digest() was already called");this.writeInto(n.subarray(0,this.outputLen)),this.destroy()}digest(){let n=new Uint8Array(this.outputLen);return this.digestInto(n),n}destroy(){this.destroyed=!0,Ze(this.state)}_cloneInto(n){let{blockLen:t,suffix:r,outputLen:o,rounds:c,enableXOF:s}=this;return n||=new e(t,r,o,s,c),n.blockLen=t,n.state32.set(this.state32),n.pos=this.pos,n.posOut=this.posOut,n.finished=this.finished,n.rounds=c,n.suffix=r,n.outputLen=o,n.enableXOF=s,n.canXOF=this.canXOF,n.destroyed=this.destroyed,n}},Ht=(e,n,t,r={})=>We(()=>new Ke(n,e,t),r);var Nt=Ht(6,136,32,_e(8));var Rt=Ht(6,72,64,_e(10));var jt=(e,n,t,r={})=>We((o={})=>new Ke(n,e,o.dkLen===void 0?t:o.dkLen,!0),r),Ct=jt(31,168,16,_e(11)),X=jt(31,136,32,_e(12));function Qe(e){if(!Number.isSafeInteger(e)||e<0||e>4294967295)throw new Error("wrong u32 integer:"+e);return e}function Pt(e){return Qe(e),(e&e-1)===0&&e!==0}function Je(e,n){if(Qe(e),!Number.isSafeInteger(n)||n<0||n>32)throw new Error(`expected integer 0 <= bits <= 32, got ${n}`);let t=0;for(let r=0;r<n;r++,e>>>=1)t=t<<1|e&1;return t>>>0}
+function vt(e){return Qe(e),31-Math.clz32(e)}function Kt(e){let n=e.length;if(!Pt(n))throw new Error("expected positive power-of-two length, got "+n);let t=vt(n);
+for(let r=0;r<n;r++){let o=Je(r,t);if(r<o){let c=e[r];e[r]=e[o],e[o]=c}}return e}var et=(e,n)=>{let{N:t,roots:r,dit:o,invertButterflies:c=!1,skipStages:s=0,brp:u=!0}=n,l=vt(t);if(!Pt(t))throw new Error("FFT: Polynomial size should be power of two");if(r.length!==t)throw new Error(`FFT: wrong roots length: expected ${t}, got ${r.length}`);let w=o!==c;return g=>{if(g.length!==t)throw new Error("FFT: wrong Polynomial length");o&&u&&Kt(g);for(let D=0,E=1;D<l-s;D++){let m=o?D+1+s:l-D,I=1<<m,_=I>>1,K=t>>m;for(let P=0;P<t;P+=I)for(let h=0,x=E++;h<_;h++){let B=c?o?t-x:x:h*K,S=P+h,k=P+h+_,O=r[B],M=g[k],H=g[S];if(w){let T=e.mul(M,O);g[S]=e.add(H,T),g[k]=e.sub(H,T)}else c?(g[S]=e.add(M,H),g[k]=e.mul(e.sub(M,H),O)):(g[S]=e.add(H,M),g[k]=e.mul(e.sub(H,M),O))}}return!o&&u&&Kt(g),g}};var oe=z;var he=Ot;function be(e,n){if(e.length!==n.length)return!1;let t=0;for(let r=0;r<e.length;r++)t|=e[r]^n[r];return t===0}function Ft(e){return Uint8Array.from(z(e))}function tt(e){if(Object.prototype.toString.call(e)!=="[object Object]")throw new TypeError("expected valid options object")}
+function Pe(e){tt(e),e.context!==void 0&&z(e.context,void 0,"opts.context")}function ve(e){Pe(e),e.extraEntropy!==!1&&e.extraEntropy!==void 0&&z(e.extraEntropy,void 0,"opts.extraEntropy")}
+function ie(e,...n){let t=o=>typeof o=="number"?o:o.bytesLen,r=n.reduce((o,c)=>o+t(c),0);return{bytesLen:r,encode:o=>{let c=new Uint8Array(r);for(let s=0,u=0;s<n.length;s++){let l=n[s],w=t(l),g=typeof l=="number"?o[s]:l.encode(o[s]);z(g,w,e),c.set(g,u),typeof l!="number"&&g.fill(0),u+=w}return c},decode:o=>{z(o,r,e);let c=[];for(let s of n){let u=t(s),l=o.subarray(0,u);c.push(typeof s=="number"?l:s.decode(l)),o=o.subarray(u)}return c}}}function re(e,n){let t=e,r=n*t.bytesLen;return{bytesLen:r,encode:o=>{if(o.length!==n)throw new RangeError(`vecCoder.encode: wrong length=${o.length}. Expected: ${n}`);let c=new Uint8Array(r);for(let s=0,u=0;s<o.length;s++){let l=t.encode(o[s]);c.set(l,u),l.fill(0),u+=l.length}return c},decode:o=>{z(o,r);let c=[];for(let s=0;s<o.length;s+=t.bytesLen)c.push(t.decode(o.subarray(s,s+t.bytesLen)));return c}}}function R(...e){for(let n of e)if(Array.isArray(n))for(let t of n)t.fill(0);else n.fill(0)}function Fe(e){if(!Number.isSafeInteger(e)||e<0||e>32)throw new RangeError(`expected bits in [0..32], got ${e}`);return e===32?4294967295:~(-1<<e)>>>0}var $t=Uint8Array.of();function nt(e,n=$t){if(z(e),z(n),n.length>255)throw new RangeError("context should be 255 bytes or less");return qe(new Uint8Array([0,n.length]),n,e)}var Bn=Uint8Array.from([6,9,96,134,72,1,101,3,4,2]);function zt(e,n=0){if(!e.oid||!be(e.oid.subarray(0,10),Bn))throw new Error("hash.oid is invalid: expected NIST hash");let t=e.outputLen*8/2;if(n>t)throw new Error("Pre-hash security strength too low: "+t+", required: "+n)}function ot(e,n,t=$t){if(z(n),z(t),t.length>255)throw new RangeError("context should be 255 bytes or less");let r=e(n);return qe(new Uint8Array([1,t.length]),t,e.oid,r)}var $e=e=>{let{newPoly:n,N:t,Q:r,F:o,ROOT_OF_UNITY:c,brvBits:s,isKyber:u}=e,l=(h,x=r)=>{let B=h%x|0;return(B>=0?B|0:x+B|0)|0},w=(h,x=r)=>{let B=l(h,x)|0;return(B>x>>1?B-x|0:B)|0};function g(){let h=n(t);for(let x=0;x<t;x++){let B=Je(x,s),S=BigInt(c)**BigInt(B)%BigInt(r);h[x]=Number(S)|0}return h}
+let D=g(),E={add:(h,x)=>l((h|0)+(x|0))|0,sub:(h,x)=>l((h|0)-(x|0))|0,mul:(h,x)=>l((h|0)*(x|0))|0,inv:h=>{throw new Error("not implemented")}},m={N:t,roots:D,invertButterflies:!0,skipStages:u?1:0,brp:!1},I=et(E,{dit:!1,...m}),_=et(E,{dit:!0,...m}),K={encode:h=>I(h),decode:h=>{_(h);for(let x=0;x<h.length;x++)h[x]=l(o*h[x]);return h}};return{mod:l,smod:w,nttZetas:D,NTT:{encode:h=>K.encode(h),decode:h=>K.decode(h)},bitsCoder:(h,x)=>{let B=Fe(h),S=h*(t/8);return{bytesLen:S,encode:k=>{let O=k,M=new Uint8Array(S);for(let H=0,T=0,Z=0,j=0;H<O.length;H++)for(T|=(x.encode(O[H])&B)<<Z,Z+=h;Z>=8;Z-=8,T>>=8)M[j++]=T&Fe(Z);return M},decode:k=>{let O=n(t);for(let M=0,H=0,T=0,Z=0;M<k.length;M++)for(H|=k[M]<<T,T+=8;T>=h;T-=h,H>>=h)O[Z++]=x.decode(H&B);return O}}}}},Dt=e=>(n,t)=>{t||(t=e.blockLen);let r=new Uint8Array(n.length+2);r.set(n);let o=n.length,c=new Uint8Array(t),s=e.create({}),u=0,l=0;return{stats:()=>({calls:u,xofs:l}),get:(w,g)=>(r[o+0]=w,r[o+1]=g,s.destroy(),s=e.create({}).update(r),u++,()=>(l++,s.xofInto(c))),clean:()=>{s.destroy(),R(c,r)}}},Ae=Dt(Ct),ze=Dt(X);var V=256,J=3329,kn=3303,On=17,q=$e({N:V,Q:J,F:kn,ROOT_OF_UNITY:On,newPoly:e=>new Uint16Array(e),brvBits:7,isKyber:!0}),rt=Object.freeze({512:Object.freeze({N:V,Q:J,K:2,ETA1:3,ETA2:2,du:10,dv:4,RBGstrength:128}),768:Object.freeze({N:V,Q:J,K:3,ETA1:2,ETA2:2,du:10,dv:4,RBGstrength:192}),1024:Object.freeze({N:V,Q:J,K:4,ETA1:2,ETA2:2,du:11,dv:5,RBGstrength:256})}),_n=e=>{if(e>=12)return{encode:t=>t,decode:t=>t>=J?t-J:t};let n=2**(e-1);return{encode:t=>((t<<e)+J/2)/J,decode:t=>t*J+n>>>e}},Ln=e=>q.bitsCoder(e,e===12?{encode:n=>n,decode:n=>n>=J?n-J:n}:{encode:n=>n,decode:n=>n}),Ue=e=>e===12?Ln(12):q.bitsCoder(e,_n(e));
+function we(e,n){let t=e,r=n;for(let o=0;o<V;o++)t[o]=q.mod(t[o]+r[o])}function Un(e,n){let t=e,r=n;for(let o=0;o<V;o++)t[o]=q.mod(t[o]-r[o])}function In(e,n,t,r,o){let c=q.mod(n*r*o+e*t),s=q.mod(e*r+n*t);return{c0:c,c1:s}}function De(e,n){let t=e,r=n;for(let o=0;o<V/2;o++){let c=q.nttZetas[64+(o>>1)];o&1&&(c=-c);let{c0:s,c1:u}=In(t[2*o+0],t[2*o+1],r[2*o+0],r[2*o+1],c);t[2*o+0]=s,t[2*o+1]=u}return t}
+function Gt(e){let n=e,t=new Uint16Array(V);for(let r=0;r<V;){let o=n();if(o.length%3)throw new Error("SampleNTT: unaligned block");for(let c=0;r<V&&c+3<=o.length;c+=3){let s=(o[c+0]>>0|o[c+1]<<8)&4095,u=(o[c+1]>>4|o[c+2]<<4)&4095;s<J&&(t[r++]=s),r<V&&u<J&&(t[r++]=u)}}return t}var Sn=(e,n)=>{let t=new Uint16Array(V),r=Ce(e);Ee(r);let o=0;for(let c=0,s=0,u=0,l=0;c<r.length;c++){let w=r[c];for(let g=0;g<32;g++)u+=w&1,w>>=1,o+=1,o===n?(l=u,u=0):o===2*n&&(t[s++]=q.mod(l-u),u=0,o=0)}if(Ee(r),o)throw new Error(`sampleCBD: leftover bits: ${o}`);return t};
+function Ie(e,n,t,r){return Sn(e(r*V/4,n,t),r)}var Mn=e=>{let n=e,{K:t,PRF:r,XOF:o,HASH512:c,ETA1:s,ETA2:u,du:l,dv:w}=n,g=Ue(1),D=Ue(w),E=Ue(l),m=ie("publicKey",re(Ue(12),t),32),I=re(Ue(12),t),_=ie("ciphertext",re(E,t),D),K=ie("seed",32,32);return{secretCoder:I,lengths:{secretKey:I.bytesLen,publicKey:m.bytesLen,cipherText:_.bytesLen},keygen:P=>{oe(P,32,"seed");let h=new Uint8Array(33);h.set(P),h[32]=t;let x=c(h),[B,S]=K.decode(x),k=[],O=[];for(let T=0;T<t;T++)k.push(q.NTT.encode(Ie(r,S,T,s)));let M=o(B);for(let T=0;T<t;T++){let Z=q.NTT.encode(Ie(r,S,t+T,s));for(let j=0;j<t;j++){let fe=Gt(M.get(j,T));we(Z,De(fe,k[j]))}O.push(Z)}M.clean();let H={publicKey:m.encode([O,B]),secretKey:I.encode(k)};return R(B,S,k,O,h,x),H},encrypt:(P,h,x)=>{let[B,S]=m.decode(P),k=[];for(let j=0;j<t;j++)k.push(q.NTT.encode(Ie(r,x,j,s)));let O=o(S),M=new Uint16Array(V),H=[];for(let j=0;j<t;j++){let fe=Ie(r,x,t+j,u),de=new Uint16Array(V);for(let ue=0;ue<t;ue++){let He=Gt(O.get(j,ue));we(de,De(He,k[ue]))}we(fe,q.NTT.decode(de)),H.push(fe),we(M,De(B[j],k[j])),R(de)}O.clean();let T=Ie(r,x,2*t,u);we(T,q.NTT.decode(M));let Z=g.decode(h);return we(Z,T),R(B,k,M,T),_.encode([H,Z])},decrypt:(P,h)=>{let[x,B]=_.decode(P),S=I.decode(h),k=new Uint16Array(V);
+for(let O=0;O<t;O++)we(k,De(S[O],q.NTT.encode(x[O])));return Un(B,q.NTT.decode(k)),R(k,S,x),g.encode(B)}}};function Hn(e){let n=e,t=Mn(n),{HASH256:r,HASH512:o,KDF:c}=n,{secretCoder:s,lengths:u}=t,l=ie("secretKey",u.secretKey,u.publicKey,32,32),w=32,g=64,D=Object.freeze({...u,seed:64,msg:w,msgRand:w,secretKey:l.bytesLen});return Object.freeze({info:Object.freeze({type:"ml-kem"}),lengths:D,keygen:(E=he(g))=>{oe(E,g,"seed");let{publicKey:m,secretKey:I}=t.keygen(E.subarray(0,32)),_=r(m),K=l.encode([I,m,_,E.subarray(32)]);return R(I,_),{publicKey:m,secretKey:K}},getPublicKey:E=>{let[m,I,_,K]=l.decode(E);return Uint8Array.from(I)},encapsulate:(E,m=he(w))=>{oe(E,u.publicKey,"publicKey"),oe(m,w,"message");let I=E.subarray(0,384*e.K),_=s.encode(s.decode(Ft(I)));if(!be(_,I))throw R(_),new Error("ML-KEM.encapsulate: wrong publicKey modulus");R(_);let K=o.create().update(m).update(r(E)).digest(),P=t.encrypt(E,m,K.subarray(32,64));return R(K.subarray(32)),{cipherText:P,sharedSecret:K.subarray(0,32)}},decapsulate:(E,m)=>{oe(m,l.bytesLen,"secretKey"),oe(E,u.cipherText,"cipherText");let I=l.bytesLen-96,_=I+32,K=r(m.subarray(I/2,_));if(!be(K,m.subarray(_,_+32)))throw new Error("invalid secretKey: hash check failed");let[P,h,x,B]=l.decode(m),S=t.decrypt(E,P),k=o.create().update(S).update(x).digest(),O=k.subarray(0,32),M=t.encrypt(h,S,k.subarray(32,64)),H=be(E,M),T=c.create({dkLen:32}).update(B).update(E).digest();return R(S,M,H?T:O),H?O:T}})}function Nn(e,n,t){return X.create({dkLen:e}).update(n).update(new Uint8Array([t])).digest()}var Rn={HASH256:Nt,HASH512:Rt,KDF:X,XOF:Ae,PRF:Nn},st=e=>Hn({...Rn,...e}),Xt=st(rt[512]),Yt=st(rt[768]),Vt=st(rt[1024]);function Zt(e,n=""){if(typeof e!="boolean"){let t=n&&`"${n}" `;throw new TypeError(t+"expected boolean, got type="+typeof e)}return e}function qt(e){tt(e),e.externalMu!==void 0&&Zt(e.externalMu,"opts.externalMu")}var U=256,xe=8380417,jn=1753,Cn=8347681,me=13,ct=Math.floor((xe-1)/88)|0,it=Math.floor((xe-1)/32)|0,ft=Object.freeze({2:Object.freeze({K:4,L:4,D:me,GAMMA1:2**17,GAMMA2:ct,TAU:39,ETA:2,OMEGA:80}),3:Object.freeze({K:6,L:5,D:me,GAMMA1:2**19,GAMMA2:it,TAU:49,ETA:4,OMEGA:55}),5:Object.freeze({K:8,L:7,D:me,GAMMA1:2**19,GAMMA2:it,TAU:60,ETA:2,OMEGA:75})}),ee=e=>new Int32Array(e),A=$e({N:U,Q:xe,F:Cn,ROOT_OF_UNITY:jn,newPoly:ee,isKyber:!1,brvBits:8}),Wt=e=>e,Se=(e,n=Wt,t=Wt)=>A.bitsCoder(e,{encode:r=>n(t(r)),decode:r=>t(n(r))}),ye=(e,n)=>{let t=e,r=n;for(let o=0;o<t.length;o++)t[o]=A.mod(t[o]+r[o]);return t},Qt=(e,n)=>{let t=e,r=n;for(let o=0;o<t.length;o++)t[o]=A.mod(t[o]-r[o]);return t},Kn=e=>{let n=e;for(let t=0;t<U;t++)n[t]<<=me;return n},Me=(e,n)=>{let t=e;for(let r=0;r<U;r++)if(Math.abs(A.smod(t[r]))>=n)return!0;return!1},ge=(e,n)=>{let t=e,r=n,o=ee(U);for(let c=0;c<t.length;c++)o[c]=A.mod(t[c]*r[c]);return o};function Ge(e){let n=e,t=ee(U);for(let r=0;r<U;){let o=n();if(o.length%3)throw new Error("RejNTTPoly: unaligned block");for(let c=0;r<U&&c<=o.length-3;c+=3){let s=(o[c+0]|o[c+1]<<8|o[c+2]<<16)&8388607;s<xe&&(t[r++]=s)}}return t}
+function ut(e){let n=e,{K:t,L:r,GAMMA1:o,GAMMA2:c,TAU:s,ETA:u,OMEGA:l}=n,{CRH_BYTES:w,TR_BYTES:g,C_TILDE_BYTES:D,XOF128:E,XOF256:m,securityLevel:I}=n;if(![2,4].includes(u))throw new Error("Wrong ETA");if(![1<<17,1<<19].includes(o))throw new Error("Wrong GAMMA1");if(![ct,it].includes(c))throw new Error("Wrong GAMMA2");let _=s*u,K=i=>{let p=A.mod(i),a=A.smod(p,2*c)|0;return p-a===xe-1?{r1:0,r0:a-1|0}:{r1:Math.floor((p-a)/(2*c))|0,r0:a}},P=i=>K(i).r1,h=i=>K(i).r0,x=(i,p)=>i<=c||i>xe-c||i===xe-c&&p===0?0:1,B=(i,p)=>{let a=Math.floor((xe-1)/(2*c)),{r1:f,r0:y}=K(p);return i===1?y>0?A.mod(f+1,a)|0:A.mod(f-1,a)|0:f|0},S=i=>{let p=A.mod(i),a=A.smod(p,2**me)|0;return{r1:Math.floor((p-a)/2**me)|0,r0:a}},k={bytesLen:l+t,encode:i=>{let p=i;if(p===!1)throw new Error("hint.encode: hint is false");let a=new Uint8Array(l+t);for(let f=0,y=0;f<t;f++){for(let b=0;b<U;b++)p[f][b]!==0&&(a[y++]=b);a[l+f]=y}return a},decode:i=>{let p=[],a=0;for(let f=0;f<t;f++){let y=ee(U);if(i[l+f]<a||i[l+f]>l)return!1;for(let b=a;b<i[l+f];b++){if(b>a&&i[b]<=i[b-1])return!1;y[i[b]]=1}a=i[l+f],p.push(y)}for(let f=a;f<l;f++)if(i[f]!==0)return!1;return p}},O=Se(u===2?3:4,i=>u-i,i=>{if(!(-u<=i&&i<=u))throw new Error(`malformed key s1/s3 ${i} outside of ETA range [${-u}, ${u}]`);return i}),M=Se(13,i=>(1<<me-1)-i),H=Se(10),T=Se(o===1<<17?18:20,i=>A.smod(o-i)),Z=Se(c===ct?6:4),j=re(Z,t),fe=ie("publicKey",32,re(H,t)),de=ie("secretKey",32,32,g,re(O,r),re(O,t),re(M,t)),ue=ie("signature",D,re(T,r),k),He=u===2?i=>i<15?2-i%5:!1:i=>i<9?4-i:!1;function lt(i){let p=i,a=ee(U);for(let f=0;f<U;){let y=p();for(let b=0;f<U&&b<y.length;b+=1){let N=He(y[b]&15),C=He(y[b]>>4&15);N!==!1&&(a[f++]=N),f<U&&C!==!1&&(a[f++]=C)}}return a}let at=i=>{let p=ee(U),a=X.create({}).update(i),f=new Uint8Array(X.blockLen);a.xofInto(f);let y=f.slice(0,8);for(let b=U-s,N=8,C=0,v=0;b<U;b++){let F=b+1;for(;F>b;)F=f[N++],!(N<X.blockLen)&&(a.xofInto(f),N=0);p[b]=p[F],p[F]=1-((y[C]>>v++&1)<<1),v>=8&&(C++,v=0)}return p},dt=i=>{let p=i,a=ee(U),f=ee(U);for(let y=0;y<p.length;y++){let{r0:b,r1:N}=S(p[y]);a[y]=b,f[y]=N}return{r0:a,r1:f}},nn=(i,p)=>{let a=i,f=p;for(let y=0;y<U;y++)a[y]=B(f[y],a[y]);return a},on=(i,p)=>{let a=i,f=p,y=ee(U),b=0;for(let N=0;N<U;N++){let C=x(a[N],f[N]);y[N]=C,b+=C}return{v:y,cnt:b}},pt=32,ht=ie("seed",32,64,32),ne=Object.freeze({info:Object.freeze({type:"internal-ml-dsa"}),lengths:Object.freeze({secretKey:de.bytesLen,publicKey:fe.bytesLen,seed:32,signature:ue.bytesLen,signRand:pt}),keygen:i=>{let p=new Uint8Array(34),a=i===void 0;a&&(i=he(32)),oe(i,32,"seed"),p.set(i),a&&R(i),p[32]=t,p[33]=r;let[f,y,b]=ht.decode(X(p,{dkLen:ht.bytesLen})),N=m(y),C=[];for(let d=0;d<r;d++)C.push(lt(N.get(d&255,d>>8&255)));let v=[];for(let d=r;d<r+t;d++)v.push(lt(N.get(d&255,d>>8&255)));let F=C.map(d=>A.NTT.encode(d.slice())),$=[],Y=[],le=E(f),G=ee(U);for(let d=0;d<t;d++){R(G);
+for(let Q=0;Q<r;Q++){let ce=Ge(le.get(Q,d));ye(G,ge(ce,F[Q]))}A.NTT.decode(G);let{r0:te,r1:W}=dt(ye(G,v[d]));$.push(te),Y.push(W)}let se=fe.encode([f,Y]),ae=X(se,{dkLen:g}),Te=de.encode([f,b,ae,C,v,$]);return le.clean(),N.clean(),R(f,y,b,C,v,F,G,$,Y,ae,p),{publicKey:se,secretKey:Te}},getPublicKey:i=>{let[p,a,f,y,b,N]=de.decode(i),C=E(p),v=y.map(Y=>A.NTT.encode(Y.slice())),F=[],$=ee(U);for(let Y=0;Y<t;Y++){$.fill(0);for(let G=0;G<r;G++){let se=Ge(C.get(G,Y));ye($,ge(se,v[G]))}A.NTT.decode($),ye($,b[Y]);let{r1:le}=dt($);F.push(le)}return C.clean(),R($,v,N,y,b),fe.encode([p,F])},sign:(i,p,a={})=>{ve(a),qt(a);let{extraEntropy:f,externalMu:y=!1}=a,[b,N,C,v,F,$]=de.decode(p),Y=[],le=E(b);for(let d=0;d<t;d++){let te=[];for(let W=0;W<r;W++)te.push(Ge(le.get(W,d)));Y.push(te)}le.clean();for(let d=0;d<r;d++)A.NTT.encode(v[d]);for(let d=0;d<t;d++)A.NTT.encode(F[d]),A.NTT.encode($[d]);let G=y?i:X.create({dkLen:w}).update(C).update(i).digest(),se=f===!1?new Uint8Array(32):f===void 0?he(pt):f;oe(se,32,"extraEntropy");let ae=X.create({dkLen:w}).update(N).update(se).update(G).digest();oe(ae,w);let Te=m(ae,T.bytesLen);e:for(let d=0;;){let te=[];for(let L=0;L<r;L++,d++)te.push(T.decode(Te.get(d&255,d>>8)()));let W=te.map(L=>A.NTT.encode(L.slice())),Q=[];for(let L=0;L<t;L++){let ke=ee(U);for(let pe=0;pe<r;pe++)ye(ke,ge(Y[L][pe],W[pe]));A.NTT.decode(ke),Q.push(ke)}let ce=Q.map(L=>L.map(P)),Be=X.create({dkLen:D}).update(G).update(j.encode(ce)).digest(),Ne=A.NTT.encode(at(Be)),Re=v.map(L=>ge(L,Ne));for(let L=0;L<r;L++)if(ye(A.NTT.decode(Re[L]),te[L]),Me(Re[L],o-_))continue e;let yt=0,Xe=[];for(let L=0;L<t;L++){let ke=A.NTT.decode(ge(F[L],Ne)),pe=Qt(Q[L],ke).map(h);if(Me(pe,c-_))continue e;let gt=A.NTT.decode(ge($[L],Ne));if(Me(gt,c))continue e;ye(pe,gt);let xt=on(pe,ce[L]);Xe.push(xt.v),yt+=xt.cnt}if(yt>l)continue;Te.clean();let rn=ue.encode([Be,Re,Xe]);return R(Be,Re,Xe,Ne,ce,Q,W,te,ae,v,F,$,...Y),y||R(G),rn}throw new Error("Unreachable code path reached, report this error")},verify:(i,p,a,f={})=>{qt(f);let{externalMu:y=!1}=f,[b,N]=fe.decode(a),C=X(a,{dkLen:g});if(i.length!==ue.bytesLen)return!1;let[v,F,$]=ue.decode(i);if($===!1)return!1;for(let d=0;d<r;d++)if(Me(F[d],o-_))return!1;let Y=y?p:X.create({dkLen:w}).update(C).update(p).digest(),le=A.NTT.encode(at(v)),G=F.map(d=>d.slice());for(let d=0;d<r;d++)A.NTT.encode(G[d]);let se=[],ae=E(b);for(let d=0;d<t;d++){let te=ge(A.NTT.encode(Kn(N[d])),le),W=ee(U);for(let ce=0;ce<r;ce++){let Be=Ge(ae.get(ce,d));ye(W,ge(Be,G[ce]))}let Q=A.NTT.decode(Qt(W,te));se.push(nn(Q,$[d]))}ae.clean();let Te=X.create({dkLen:D}).update(Y).update(j.encode(se)).digest();for(let d of $)if(!(d.reduce((W,Q)=>W+Q,0)<=l))return!1;for(let d of F)if(Me(d,o-_))return!1;return be(v,Te)}});return Object.freeze({info:Object.freeze({type:"ml-dsa"}),internal:ne,securityLevel:I,keygen:ne.keygen,lengths:ne.lengths,getPublicKey:ne.getPublicKey,sign:(i,p,a={})=>{ve(a);let f=nt(i,a.context),y=ne.sign(f,p,a);return R(f),y},verify:(i,p,a,f={})=>(Pe(f),ne.verify(i,nt(p,f.context),a)),prehash:i=>(zt(i,I),Object.freeze({info:Object.freeze({type:"hashml-dsa"}),securityLevel:I,lengths:ne.lengths,keygen:ne.keygen,getPublicKey:ne.getPublicKey,sign:(p,a,f={})=>{ve(f);let y=ot(i,p,f.context),b=ne.sign(y,a,f);return R(y),b},verify:(p,a,f,y={})=>(Pe(y),ne.verify(p,ot(i,a,y.context),f))}))})}var Jt=ut({...ft[2],CRH_BYTES:64,TR_BYTES:64,C_TILDE_BYTES:32,XOF128:Ae,XOF256:ze,securityLevel:128}),en=ut({...ft[3],CRH_BYTES:64,TR_BYTES:64,C_TILDE_BYTES:48,XOF128:Ae,XOF256:ze,securityLevel:192}),tn=ut({...ft[5],CRH_BYTES:64,TR_BYTES:64,C_TILDE_BYTES:64,XOF128:Ae,XOF256:ze,securityLevel:256});return an(Pn);})();
+/*! noble-post-quantum - MIT License (c) 2024 Paul Miller (paulmillr.com) */
+
+   const { ml_kem1024, ml_dsa87, randomBytes } = noblePQC;
+
+   const enc = new TextEncoder();
+   const dec = new TextDecoder();
+   let authorIsAuthentic = isAuthentic = false;
+
+  async function getKeys(){
+   const mlkemKeys = ml_kem1024.keygen();
+   const seed = randomBytes(32);
+   const dsaKeys = ml_dsa87.keygen(seed);
+
+   const toHex = (u8) => Array.from(u8).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Convert to Hex to show the user
+    let pubHex = toHex(mlkemKeys.publicKey);
+    let privHex = toHex(mlkemKeys.secretKey);
+
+    let pubDsa = toHex(dsaKeys.publicKey);
+    let privDsa = toHex(dsaKeys.secretKey);
+
+    return [pubHex, privHex, pubDsa, privDsa];
+  }
+
+  async function deriveKey(password, salt) {
+        const passwordKey = await crypto.subtle.importKey(
+            "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+        );
+        password='';
+        return await crypto.subtle.deriveKey(
+            { name: "PBKDF2", salt: salt, iterations: 700000, hash: "SHA-512" },
+            passwordKey,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    }
+
+
+async function packFiles(files) {
+    let totalSize = 12;
+    const archiveTimestamp = BigInt(Date.now());
+    const fileDataObjects = [];
+
+    for (const file of files) {
+        // FIX: Ensure we are handling the buffer correctly
+        const data = file.buffer instanceof ArrayBuffer ? file.buffer : await file.arrayBuffer();
+        const nameBytes = enc.encode(file.name);
+
+        fileDataObjects.push({ nameBytes, data, size: data.byteLength });
+        totalSize += 8 + nameBytes.length + data.byteLength;
+    }
+
+    const packed = new Uint8Array(totalSize);
+    const view = new DataView(packed.buffer);
+
+    view.setUint32(0, files.length, true);
+    view.setBigUint64(4, archiveTimestamp, true);
+
+    let offset = 12;
+    for (const file of fileDataObjects) {
+        // Name Metadata
+        view.setUint32(offset, file.nameBytes.length, true);
+        offset += 4;
+        packed.set(file.nameBytes, offset);
+        offset += file.nameBytes.length;
+
+        // Data Metadata
+        view.setUint32(offset, file.size, true);
+        offset += 4;
+        packed.set(new Uint8Array(file.data), offset);
+        offset += file.size;
+    }
+
+    // Return the Uint8Array itself (for AES) or the .buffer
+    return packed;
+}
+
+
+async function unpackFiles(packedBuffer) {
+    const view = new DataView(packedBuffer);
+    const dec = new TextDecoder();
+
+    // Read Header
+    const fileCount = view.getUint32(0, true);
+    const timestampBigInt = view.getBigUint64(4, true);
+    const timestamp = Number(timestampBigInt);
+
+    console.log(`Unpacking ${fileCount} files created at:`, new Date(Number(timestamp)));
+
+    const extractedFiles = [];
+    let offset = 12; // Start after the 12-byte header
+
+    for (let i = 0; i < fileCount; i++) {
+        // Read Name Length (4 bytes)
+        const nameLen = view.getUint32(offset, true);
+        offset += 4;
+
+        // Read Name
+        const nameBytes = new Uint8Array(packedBuffer, offset, nameLen);
+        const fileName = dec.decode(nameBytes);
+        offset += nameLen;
+
+        // Read File Size (4 bytes)
+        const fileSize = view.getUint32(offset, true);
+        offset += 4;
+
+        // Extract File Data
+        // We use .slice() to give each file its own independent memory space
+        const fileData = packedBuffer.slice(offset, offset + fileSize);
+        offset += fileSize;
+
+        extractedFiles.push({
+            name: fileName,
+            data: fileData, // This is an ArrayBuffer/Uint8Array
+            size: fileSize
+        });
+    }
+
+        return {
+        files: extractedFiles,
+        archiveDate: new Date(timestamp)
+    };
+}
+
+
+function w3HexToUint8(hexInput) {
+    // Handle if it's an array from WP
+    let hex = Array.isArray(hexInput) ? hexInput[0] : hexInput;
+
+    // Aggressive cleaning
+    hex = String(hex).replace(/[^0-9a-fA-F]/g, '');
+
+    //console.log("Worker Hex String Length:", hex.length); // MUST be 3136
+
+    const byteLen = hex.length / 2;
+    const result = new Uint8Array(byteLen);
+
+    for (let i = 0; i < byteLen; i++) {
+        // Use substring to pull 2 chars and convert to 1 byte
+        result[i] = parseInt(hex.substring(i * 2, (i * 2) + 2), 16);
+    }
+
+    //console.log("Worker Byte Result Length:", result.length); // MUST be 1568
+    return result;
+}
+
+
+function hexToUint8Array(hexInput) {
+
+
+  // If it's an array take the first element
+  let hexString = Array.isArray(hexInput) ? hexInput[0] : hexInput;
+
+  // Ensure it is actually a string before calling .replace()
+  if (typeof hexString !== 'string') {
+    console.error("Critical: Public Key is missing or not a string!", hexString);
+    return new Uint8Array(0);
+  }
+
+  // Clean and convert
+  hexString = hexString.replace(/\s/g, '');
+  const result = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < result.length; i++) {
+    result[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  }
+  return result;
+}
+
+
+
+async function encryptFileForMultipleMLKEM1024(fileBuffer, recipientKeys, senderDsaPrivateKeyHex) {
+
+    const kemEngine = noblePQC.ml_kem1024;
+    const dsaEngine = noblePQC.ml_dsa87;
+
+    const SIG_SIZE = 4627;
+    const CT_SIZE = 1568;
+    const BLOCK_SIZE = 1604;
+    const headerSize = 6;
+
+    const fileBytes = new Uint8Array(fileBuffer);
+    let signedPayload;
+    let isSigned = 0;
+
+    if (senderDsaPrivateKeyHex && senderDsaPrivateKeyHex.length > 0) {
+        const cleanedHex = senderDsaPrivateKeyHex.replace(/[^a-f0-9]/gi, '').toLowerCase();
+        const dsaPrivKey = w3HexToUint8(cleanedHex);
+
+        if (dsaPrivKey.length !== 4896) {
+            throw new Error(`w3mypq Cryptographic Error: Expected a 4896-byte array, got length=${dsaPrivKey.length}.`);
+        }
+
+        // SECURITY FIX: Enforce the explicit domain separation context string
+        const signatureCtx = new TextEncoder().encode("w3mypq-file-sig-v1");
+
+        // ML-DSA signature generation is synchronous in noble-post-quantum
+        const signatureResult = dsaEngine.sign(fileBytes, dsaPrivKey, { context: signatureCtx });
+        const cleanSignatureBytes = new Uint8Array(signatureResult);
+
+        signedPayload = new Uint8Array(SIG_SIZE + fileBytes.length);
+        signedPayload.set(cleanSignatureBytes);
+        signedPayload.set(fileBytes, SIG_SIZE);
+        isSigned = 1;
+    } else {
+        signedPayload = fileBytes;
+    }
+
+    const masterKeyBytes = crypto.getRandomValues(new Uint8Array(32));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    const recipientSectionSize = recipientKeys.length * BLOCK_SIZE;
+    const metadataHeaderSize = headerSize + recipientSectionSize;
+
+    // We don't know encryptedData.length yet, but we allocate plenty or calculate it (signedPayload.length + 16 bytes GCM tag)
+    const estimatedCiphertextSize = signedPayload.length + 16;
+    const totalSize = metadataHeaderSize + 12 + estimatedCiphertextSize;
+    const finalBuffer = new Uint8Array(totalSize);
+
+    // Build the unencrypted Header Metadata structure first
+    new TextEncoder().encodeInto("W3PQ", finalBuffer.subarray(0, 4));
+
+    const headerView = new DataView(finalBuffer.buffer);
+    headerView.setUint8(4, recipientKeys.length);
+    headerView.setUint8(5, isSigned);
+
+    // Process the ML-KEM loop directly into the final array
+    let offset = headerSize;
+    for (const pk of recipientKeys) {
+        const { cipherText, sharedSecret } = await kemEngine.encapsulate(pk);
+
+        const sharedSecretHashBuffer = await crypto.subtle.digest("SHA-256", sharedSecret);
+        const sharedSecretHash = new Uint8Array(sharedSecretHashBuffer);
+
+        const wrappedKey = new Uint8Array(32);
+        for (let j = 0; j < 32; j++) {
+            wrappedKey[j] = masterKeyBytes[j] ^ sharedSecretHash[j];
+        }
+
+        finalBuffer.fill(0, offset, offset + 4);
+        finalBuffer.set(new Uint8Array(cipherText), offset + 4);
+        finalBuffer.set(wrappedKey, offset + 4 + CT_SIZE);
+        offset += BLOCK_SIZE;
+    }
+
+    // Extract the complete metadata section to use as AEAD "additionalData"
+    // Use .subarray to guarantee correct AEAD tracking binding
+    const additionalDataBuffer = finalBuffer.subarray(0, metadataHeaderSize);
+
+    // Perform Authenticated Encryption binding the metadata section
+
+    const aesKey = await crypto.subtle.importKey("raw", masterKeyBytes, {name: "AES-GCM"}, false, ["encrypt"]);
+    const encryptedData = new Uint8Array(await crypto.subtle.encrypt(
+        {
+            name: "AES-GCM",
+            iv: iv,
+            additionalData: additionalDataBuffer
+        },
+        aesKey,
+        signedPayload
+    ));
+
+    // Zero out sensitive master key memory components
+    masterKeyBytes.fill(0);
+    // Write the final IV and payload into the remaining offset space
+    finalBuffer.set(iv, offset);
+    finalBuffer.set(encryptedData, offset + 12);
+    // Slice to the exact actual size in case padding or tag estimation varied
+    const preciseTotalSize = metadataHeaderSize + 12 + encryptedData.length;
+    const exactFinalBuffer = finalBuffer.subarray(0, preciseTotalSize);
+
+    return new Blob([exactFinalBuffer], { type: "application/octet-stream" });
+}
+
+
+
+async function decryptFileForMultipleMLKEM1024(arrayBuffer, alicePrivateKey, senderDsaPublicKeyHex) {
+    //importScripts(library_url);
+    const kemEngine = noblePQC.ml_kem1024;
+    const dsaEngine = noblePQC.ml_dsa87;
+
+    const SIG_SIZE = 4627;
+    const headerSize = 6;
+    const CT_SIZE = 1568;
+    const BLOCK_SIZE = 1604;
+
+    const sk = w3HexToUint8(alicePrivateKey.replace(/[^a-f0-9]/gi, '').toLowerCase());
+    const view = new DataView(arrayBuffer);
+    const recipientCount = view.getUint8(4);
+    const isSigned = view.getUint8(5);
+
+    // Extract the complete unencrypted metadata header block
+    const metadataHeaderSize = headerSize + (recipientCount * BLOCK_SIZE);
+    // Safety boundaries check to avoid malformed inputs crashing memory
+    if (metadataHeaderSize + 12 > arrayBuffer.byteLength) {
+        throw new Error("Invalid payload: File header bounds mismatch.");
+    }
+
+    // Avoid .slice() byte copying; parse the exact underlying buffer reference space
+    const additionalDataBuffer = new Uint8Array(arrayBuffer, 0, metadataHeaderSize);
+
+    const ivOffset = metadataHeaderSize;
+    const iv = new Uint8Array(arrayBuffer.slice(ivOffset, ivOffset + 12));
+    const encryptedData = arrayBuffer.slice(ivOffset + 12);
+
+    for (let i = 0; i < recipientCount; i++) {
+        const offset = headerSize + (i * BLOCK_SIZE);
+        const ct = new Uint8Array(arrayBuffer.slice(offset + 4, offset + 4 + CT_SIZE));
+        const wk = new Uint8Array(arrayBuffer.slice(offset + 4 + CT_SIZE, offset + 4 + CT_SIZE + 32));
+
+        let decryptedBundle;
+
+        try {
+            const sharedSecret = await kemEngine.decapsulate(ct, sk);
+
+            const sharedSecretHashBuffer = await crypto.subtle.digest("SHA-256", sharedSecret);
+            const sharedSecretHash = new Uint8Array(sharedSecretHashBuffer);
+
+            const masterKey = new Uint8Array(32);
+            for (let j = 0; j < 32; j++) {
+                masterKey[j] = wk[j] ^ sharedSecretHash[j];
+            }
+
+            const aesKey = await crypto.subtle.importKey("raw", masterKey, { name: "AES-GCM" }, false, ["decrypt"]);
+
+            decryptedBundle = await crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                    additionalData: additionalDataBuffer // Validates entire recipient layout alignment
+                },
+                aesKey,
+                encryptedData
+            );
+
+            masterKey.fill(0); // Instantly scrub symmetric data footprint
+
+        } catch (e) {
+            continue; // Fall through to subsequent recipient slots
+        }
+
+        const bundleU8 = new Uint8Array(decryptedBundle);
+        let isAuthentic = false;
+
+        if (isSigned === 1) {
+            const vSig = Uint8Array.from(bundleU8.slice(0, SIG_SIZE));
+            const vFile = Uint8Array.from(bundleU8.slice(SIG_SIZE));
+
+            if (senderDsaPublicKeyHex && senderDsaPublicKeyHex.length > 500) {
+                const cleanHex = senderDsaPublicKeyHex.replace(/[^a-f0-9]/gi, '').toLowerCase();
+                const senderPubKey = w3HexToUint8(cleanHex);
+
+                // Enforce the explicit domain separation context string
+                const signatureCtx = new TextEncoder().encode("w3mypq-file-sig-v1");
+
+                // ML-DSA verification runs synchronously in the underlying noble post-quantum engine
+                isAuthentic = dsaEngine.verify(vSig, vFile, senderPubKey, { context: signatureCtx });
+
+                if (!isAuthentic) {
+                   console.error("IDENTITY NOT VERIFIED! Check if keys match.");
+                  //throw new Error("Signature validation failed: Sender identity verification crashed.");
+                } else {
+                   console.log("IDENTITY VERIFIED SUCCESSFULLY!");
+                }
+            } else {
+            	     console.error("Cryptographic Policy Violation: File is signed, but no valid sender verification public key was supplied.");
+               // Block files declaring signature data if no valid verification key is supplied
+               // throw new Error("Cryptographic Policy Violation: File is signed, but no valid sender verification public key was supplied.");
+            }
+
+            return { buffer: vFile.buffer, isAuthentic: isAuthentic };
+        }
+
+        // Return file data safely with false validation status for intentionally unsigned operations
+        return { buffer: decryptedBundle, isAuthentic: false };
+    }
+    throw new Error("No matching key found or file tampered with.");
+}
+
+
+self.onmessage = async (e) => {
+
+ // Add to the destructuring list
+  const { action, buffer, files, publicKeys, privateKey, library_url, senderDsaPrivateKeyHex, sender_pub_mldsa } = e.data;
+
+if (action === 'GET_KEYS' )
+{
+         const result = await getKeys();
+
+        self.postMessage({ type: 'DONE', result: result });
+
+}
+
+if (action === 'MLKEM_ENCRYPT' )
+{
+       const importedKeys = publicKeys.map(keyHex => {
+        const bytes = hexToUint8Array(keyHex);
+        if (bytes.length !== 1568) {
+            throw new Error(`Invalid Key Length! Expected 1568, got ${bytes.length}.`);
+        }
+        return bytes;
+    });
+
+   try {
+         let dataToEncrypt = (files && files.length > 0) ? await packFiles(files) : buffer;
+         const result = await encryptFileForMultipleMLKEM1024(dataToEncrypt, importedKeys, senderDsaPrivateKeyHex);
+
+         self.postMessage({ type: 'DONE', result: result });
+       } catch (err) {
+            self.postMessage({ type: 'ERROR', msg: "Key Import Failed: " + err.message });
+       }
+
+}
+
+
+if (action === 'MLKEM_DECRYPT')
+{
+        try {
+            // Extract both the decrypted payload and the verified authentic status from the returned object package
+            const { buffer: decryptedPackedBuffer, isAuthentic } = await decryptFileForMultipleMLKEM1024(buffer, privateKey, sender_pub_mldsa);
+
+            const unpacked = await unpackFiles(decryptedPackedBuffer);
+            const transferables = unpacked.files.map(f => f.data.buffer || f.data);
+
+            // Pristine post-quantum verified status sent straight to frontend DOM elements
+            self.postMessage({ type: 'DONE_DECRYPT', result: { unpacked, isAuthentic } }, transferables);
+            self.close();
+        } catch (err) {
+            self.postMessage({ type: 'ERROR', msg: err.message });
+        }
+}
+
+};
+
+</script>
+
+
+
+<script>
+
+async function getPrivPubKey_G() {
+    // Wrap the reader in a Promise so the calling 'await' actually works
+    return new Promise((resolve) => {
+     resolve(w3mypgpEngine.loadMLKEMkeys());
+    });
+}
+
+  const loadMLKEMkeysfromFile = document.querySelector('input[name="myPubPrivKeyTXT"]');
+
+document.addEventListener('change', function(event) {
+
+    if (event.target.id === 'wpw3MLKEMPrivateKeyLoad') {
+
+      (async () => {
+        let k = await getPrivPubKey_G();
+        let p = k[1];
+        myprivKey = p;
+        w3mypgpEngine.w3decryptWithtMLKEM();
+
+      })();
+    }
+});
+
+(function() {
+   /* (C) 2026 axew3.com */
+  // Hybrid encrypt/decrypt
+
+let code = document.getElementById('worker-script').textContent;
+let encryptionWorker;
+let autoReload=0;
+let password=uPublicKeyMlkemLoaded=uPrivateKeyMlkemLoaded=uPrivateKeyMldsa=uPubKeyMldsa='';
+let activeBlobUrls = [];
+var dec = new TextDecoder('latin1');
+var enc = new TextEncoder();
+let requestedEncrypted;
+let buffer,allArmoredKeys;
+let pemFormattedKey = '';
+
+
+// temp duplicate
+const videoMimeTypes = ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/x-msvideo", "video/x-ms-wmv", "video/x-matroska", "video/x-m4v", "video/x-flv", "video/3gpp", "video/3gpp2", "video/mp2t", "video/mpeg", "video/dvd", "video/x-f4v", "video/x-ms-asf", "video/divx"];
+const audioMimeTypes = ["audio/mpeg", "audio/ogg", "audio/wav", "audio/webm", "audio/aac", "audio/flac", "audio/midi", "audio/x-midi", "audio/x-ms-wma", "audio/opus", "audio/m4a", "audio/mp4", "audio/3gpp", "audio/3gpp2", "audio/aiff", "audio/x-aiff", "audio/basic", "audio/L24"];
+const imageMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "image/avif", "image/apng", "image/bmp", "image/tiff", "image/x-icon", "image/vnd.microsoft.icon", "image/heic", "image/heif", "image/jxl", "image/jp2"];
+
+const mimeMap = {
+    // Images
+    "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "gif": "image/gif",
+    "webp": "image/webp", "svg": "image/svg+xml", "avif": "image/avif", "bmp": "image/bmp",
+    "ico": "image/x-icon", "heic": "image/heic", "heif": "image/heif",
+    // Video
+    "mp4": "video/mp4", "webm": "video/webm", "ogg": "video/ogg", "mov": "video/quicktime",
+    "mkv": "video/x-matroska", "avi": "video/x-msvideo",
+    // Audio
+    "mp3": "audio/mpeg", "wav": "audio/wav", "flac": "audio/flac", "aac": "audio/aac",
+    "m4a": "audio/mp4", "opus": "audio/opus",
+    // Text
+    "txt": "text/plain"
+};
+
+
+function engineWorkerRestart(){
+ var b = new Blob([code], { type: 'application/javascript' });
+ var workerURL = URL.createObjectURL(b);
+ var encryptionWorker = new Worker(workerURL);
+ return encryptionWorker;
+}
+
+
+async function getKeys(){
+
+encryptionWorker = engineWorkerRestart();
+
+    //await encryptionWorker.postMessage('GET_KEYS');
+    encryptionWorker.postMessage({
+        action: 'GET_KEYS',
+    });
+
+    encryptionWorker.onmessage = (e) => {
+
+           const[pubHex, privHex, pubDsa, privDsa] = e.data.result;
+
+    let a = '-----BEGIN PUBLIC KEY-----'+pubHex+'-----END PUBLIC KEY----------BEGIN PRIVATE KEY-----'+privHex+'-----END PRIVATE KEY-----';
+    let aa = new Blob([a], {type: 'text/plain'});
+    let pubPrivKem = window.URL.createObjectURL(aa);
+
+    let b = '-----BEGIN PUBLIC KEY-----'+pubHex+'-----END PUBLIC KEY-----';
+    let bb = new Blob([b], {type: 'text/plain'});
+    let pubKem = window.URL.createObjectURL(bb);
+
+    let c = '-----BEGIN PRIVATE KEY-----'+privHex+'-----END PRIVATE KEY-----';
+    let cc = new Blob([c], {type: 'text/plain'});
+    let privKem = window.URL.createObjectURL(cc);
+
+    let d = '-----BEGIN PUBLIC KEY-----'+pubDsa+'-----END PUBLIC KEY----------BEGIN PRIVATE KEY-----'+privDsa+'-----END PRIVATE KEY-----';
+    let dd = new Blob([d], {type: 'text/plain'});
+    let pubPrivDsaKey = window.URL.createObjectURL(dd);
+
+    let g = '-----BEGIN PUBLIC KEY-----'+pubDsa+'-----END PUBLIC KEY-----';
+    let gg = new Blob([g], {type: 'text/plain'});
+    let pubDsaKey = window.URL.createObjectURL(gg);
+
+    let f = '-----BEGIN PRIVATE KEY-----'+privDsa+'-----END PRIVATE KEY-----';
+    let ff = new Blob([f], {type: 'text/plain'});
+    let privDsaKey = window.URL.createObjectURL(ff);
+
+    // Hybrid?? For users to be stored?
+    let kemDsa = '-----BEGIN MLKEM-PUBLIC KEY-----'+pubHex+'-----END MLKEM-PUBLIC KEY-----'+'-----BEGIN DSA-PRIVATE KEY-----'+privDsa+'-----END DSA-PRIVATE KEY-----';
+    let kd = new Blob([kemDsa], {type: 'text/plain'});
+    let privKem_PubDsa_Keys = window.URL.createObjectURL(kd);
+
+    a=b=c=d=g=f='';
+
+    const status = document.getElementById('save-mlkem-status');
+
+   document.getElementById("wrapGenCryptoKeys").setAttribute("style", "display:block;");
+   document.getElementById("w3mypgp_wrapKeysDownload").setAttribute("style", "display:flex;");
+
+   document.getElementById("w3downloadPub_MLKEMKey").setAttribute("download", '_mlkem_Public-Key.txt');
+   document.getElementById("w3downloadPub_MLKEMKey").setAttribute("href", pubKem);
+   document.getElementById("w3downloadPriv_MLKEMKey").setAttribute("download", '_mlkem_Private-Key.txt');
+   document.getElementById("w3downloadPriv_MLKEMKey").setAttribute("href", privKem);
+
+   document.getElementById("w3downloadPubPriv_MLKEMKeys").setAttribute("download", '_mlkem_Public-Private-Key.txt');
+   document.getElementById("w3downloadPubPriv_MLKEMKeys").setAttribute("href", pubPrivKem);
+
+   document.getElementById("w3downloadPub_MLDSAKey").setAttribute("download", '_mldsa_Public-Key.txt');
+   document.getElementById("w3downloadPriv_MLDSAKey").setAttribute("download", '_mldsa_Private-Key.txt');
+   document.getElementById("w3downloadPubPriv_MLDSAKeys").setAttribute("download", '_mldsa_Public-Private-Key.txt');
+
+   document.getElementById("w3downloadPub_MLDSAKey").setAttribute("href", pubDsaKey);
+   document.getElementById("w3downloadPriv_MLDSAKey").setAttribute("href", privDsaKey);
+   document.getElementById("w3downloadPubPriv_MLDSAKeys").setAttribute("href", pubPrivDsaKey);
+    }
+}
+
+
+async function loadMLKEMkeys(){
+
+    let k='';
+
+    if(document.getElementById('wpw3MLKEMPrivateKeyLoad')?.files?.length > 0){
+     // console.log('wpw3MLKEMPrivateKeyLoad ',loadMLKEMkeysfromFile);
+      k = document.getElementById("wpw3MLKEMPrivateKeyLoad").files[0];
+      document.getElementById('wpw3MLKEMPrivateKeyLoad').value = null;
+    } else {
+      k = loadMLKEMkeysfromFile.files[0];
+      document.getElementById('myPubPrivKeyTXT').value = null;
+     }
+
+    if(!k){ alert('No file selected'); return; }
+
+    let keys = await k.text();
+
+   // console.log(keys);
+
+    let k0 = keys.split('-----BEGIN PUBLIC KEY-----');
+    let k1 = keys.split('-----BEGIN PRIVATE KEY-----');
+
+    /*console.log('k0 length ',k0.length);
+    console.log('k1 length ',k1.length);*/
+
+    document.getElementById('myPubPrivKeyTXT').value = null;
+
+   if( k0.length < 2 && k1.length < 2 ){
+     alert('The selected file do not contain a Public or Private key!');
+     return;
+   }
+
+    // Both Public and Private keys loaded
+   if( k0.length == 2 && k1.length == 2 ){
+
+    let bothK = k0[1].trim();
+
+    let pk0 = keys.split('-----END PUBLIC KEY-----');
+
+    uPublicKeyMlkemLoaded  = pk0[0].replace(/-----BEGIN PUBLIC KEY-----/g, '').replace(/-----END PUBLIC KEY-----/g, '').replace(/\s/g, '');
+    uPrivateKeyMlkemLoaded = pk0[1].replace(/-----BEGIN PRIVATE KEY-----/g, '').replace(/-----END PRIVATE KEY-----/g, '').replace(/\s/g, '');
+
+      document.getElementById("pubKeyState").textContent='Public key loaded';
+      document.getElementById("pubKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+      document.getElementById("pubKeyInfoMLKEM").textContent=uPublicKeyMlkemLoaded;
+      document.getElementById("privKeyState").textContent='Private key loaded';
+      document.getElementById('myPubPrivKeyTXT').value = null;
+      document.getElementById("privKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+      document.getElementById("privKeyInfoMLKEM").textContent='Private key loaded but not displayed';
+
+   } else if ( k0.length == 2 && k1.length == 1 ) {
+    // The Public Key has been loaded
+    //console.log('k0 ',k0);
+    let uPuK = k0[1].trim();
+    uPublicKeyMlkemLoaded  = uPuK.replace(/-----END PUBLIC KEY-----/g, '').replace(/\s/g, '');
+
+      document.getElementById("pubKeyState").textContent='Public key loaded';
+      document.getElementById("pubKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+      document.getElementById("pubKeyInfoMLKEM").textContent=uPublicKeyMlkemLoaded;
+
+   } else if ( k0.length == 1 && k1.length == 2 ) {
+    // The Private Key has been loaded
+    //console.log('k1 ',k1);
+    let uPrK = k1[1].trim();
+    uPrivateKeyMlkemLoaded = uPrK.replace(/-----END PRIVATE KEY-----/g, '').replace(/\s/g, '');
+
+      document.getElementById("privKeyState").textContent='Private key loaded';
+      document.getElementById('myPubPrivKeyTXT').value = null;
+      document.getElementById("privKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+      document.getElementById("privKeyInfoMLKEM").textContent='Private key loaded but not displayed';
+   }
+
+    /*console.log('uPublicKeyMlkemLoaded ',uPublicKeyMlkemLoaded);
+    console.log('uPrivateKeyMlkemLoaded ',uPrivateKeyMlkemLoaded);*/
+
+    return [uPublicKeyMlkemLoaded,uPrivateKeyMlkemLoaded];
+
+}
+
+async function senderMldsaPrivLoad(){
+
+   try{
+    if(document.getElementById('senderMldsaPrivLoad')?.files?.length > 0){
+      let k = document.getElementById("senderMldsaPrivLoad").files[0];
+      let kk = await k.text();
+
+     let publicKeyRegex = /-----BEGIN PUBLIC KEY-----([\s\S]*?)-----END PUBLIC KEY-----/;
+     let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
+
+     let privateMatches = kk.match(privateKeyRegex);
+
+     uPrivateKeyMldsa = privateMatches ? privateMatches[1].trim() : '';
+
+      document.getElementById('senderMldsaPrivLoad').value = null;
+      // Set loaded the class of priv-mlkem-dsa-state
+      document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
+      document.getElementById("priv-mlkem-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
+    }
+   } catch (err) {
+        return err;
+    }
+
+  return uPrivateKeyMldsa;
+
+}
+
+async function senderMldsaPubLoad(){
+
+   try{
+    if(document.getElementById('senderMldsaPubLoad')?.files?.length > 0){
+      let k = document.getElementById("senderMldsaPubLoad").files[0];
+      let kk = await k.text();
+
+     let publicKeyRegex = /-----BEGIN PUBLIC KEY-----([\s\S]*?)-----END PUBLIC KEY-----/;
+     let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
+
+     let privateMatches = kk.match(privateKeyRegex);
+     let pubMatches = kk.match(publicKeyRegex);
+
+     uPrivateKeyMldsa = privateMatches ? privateMatches[1].trim() : '';
+     uPubKeyMldsa = pubMatches ? pubMatches[1].trim() : '';
+
+      document.getElementById('senderMldsaPubLoad').value = null;
+      // Set loaded the class of priv-mlkem-dsa-state
+      document.getElementById("pub-mlkem-dsa-state").className = "mlkem-dsa-loaded-pub";
+      document.getElementById("pub-mlkem-dsa-state").innerHTML = "<b>Public ML-DSA sign key loaded</b>";
+    }
+   } catch (err) {
+        return err;
+    }
+
+  return uPubKeyMldsa;
+
+}
+
+
+
+async function recipientsSendEmails(unames,downloadLink){
+
+    try {
+        const response = await fetch(w3pgpConfig.root + 'send-emails', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': w3pgpConfig.nonce // Security
+            },
+            body: JSON.stringify({
+              unames: unames,
+              downloadLink: downloadLink
+            })
+        });
+
+        const result = await response.json();
+            return result;
+
+    } catch (err) {
+        return err;
+    }
+}
+
+
+
+async function w3CheckForEncryptedLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const file = urlParams.get('w3download');
+    const token = urlParams.get('key');
+
+    if (file && token) {
+        console.log("Encrypted link detected. Fetching payload...");
+
+        // alert('Encrypted link detected');
+        // Trigger click to Auto Open the decrypt screen
+        document.getElementById("decryptInterface").click();
+
+        // Show a "Loading" status
+
+        const status = document.getElementById("w3_wrap_link-decrypt-form");
+        status.setAttribute("style", "display:block;");
+
+        document.getElementById('w3_wrap_link-decrypt-form').scrollIntoView({ behavior:'smooth', block:'start' });
+
+     /*setTimeout(() => {
+       document.getElementById('w3_wrap_link-decrypt-form').scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 1000);*/
+
+       status.innerHTML = "?? <b>Retrieving encrypted file from vault...</b>";
+
+        try {
+            // Call get-encrypted-content endpoint
+            const response = await fetch(`${w3pgpConfig.root}get-encrypted-content?file=${file}&key=${token}`);
+
+            if (response.status == 200) {
+
+             buffer = await response.arrayBuffer();
+
+             status.setAttribute("style", "display:none;");
+             document.getElementById('w3EncryptedLoaded').setAttribute("style","display:block;");
+             document.getElementById('w3EncryptedLoaded').scrollIntoView({ behavior:'smooth', block:'start' });
+            } else {
+                status.innerHTML = "? <b>Link Expired:</b> The file is no longer available.";
+            }
+        } catch (err) {
+            console.error(err);
+            status.innerHTML = "? Failed to reach the server.";
+        }
+    }
+}
+
+
+async function w3encryptMLKEM(key, fromTypedText) {
+
+    if (isDoingTask > 0) return;
+    encryptionWorker = engineWorkerRestart();
+
+    document.querySelectorAll('.decryptedHybridDisplay').forEach(el => el.remove());
+    document.getElementById('downFileEncMlkem').style.display = "none";
+
+    var uidsAry = [];
+
+        // --- File Handling
+    if (fromTypedText < 1) {
+
+      if (document.getElementById('myFileToBeCryptedMLKEM')?.files?.length > 0){
+        files = document.getElementById("myFileToBeCryptedMLKEM").files;
+      }
+
+    } else {
+        const messageBox = document.querySelector("#w3mlkemEncryptTxtInput");
+        const textFile = new File([messageBox.value.trim()], Date.now() + "_message.txt", {
+            type: "text/plain", lastModified: Date.now()
+        });
+        const container = new DataTransfer();
+        container.items.add(textFile);
+        files = container.files;
+    }
+
+    if (!files || files.length === 0) {
+     alert("No files selected.");
+     return;
+    }
+
+
+
+
+/*if (totalSize > w3pgpConfig.max_upload_size) {
+    limitDisplay.textContent = `?? Too Large: ${(totalSize/1024/1024).toFixed(1)}MB / ${w3pgpConfig.max_upload_human}`;
+    limitDisplay.style.color = "#e74c3c"; // Warning red
+    alert('The selected file(s) exceed the maximum upload limit!\n\nThe encrypted file will not be saved to the Server vault, and no emails will be sent to recipients.\n\nYou can download the file after encryption.');
+} else {
+    limitDisplay.textContent = `? Ready (${(totalSize/1024/1024).toFixed(1)}MB)`;
+    limitDisplay.style.color = "#27ae60";
+}*/
+
+ //console.log("Proceeding with resulting uidsAry:", uidsAry);
+
+     if(uidsAry.length > 0){
+      allArmoredKeys = await get_bulk_keys(uidsAry);
+     } else {
+       allArmoredKeys = [];
+      }
+
+ //console.log("Proceeding with resulting allArmoredKeys:", allArmoredKeys);
+
+    /*if (allArmoredKeys.length === 0) {
+     let c = confirm('No valid recipient keys found.\n\nDo you want to encrypt the files for yourself?\n\nNote: If a public key was provided via input, it will be used. Otherwise, the key saved in your profile (if you are logged in and a key exists) will be used.\n\nAlso note that in this case, no encrypted files will be saved to the server for sharing.\n\nConfirm?');
+     if(!c){
+      document.getElementById("myFileToBeCryptedMLKEM").value = null;
+      return;
+     }
+    }*/
+
+
+    /*
+     -- Check the Private key loaded from the input if there is
+     -- If there is not, proceed with the one saved on profile
+    */
+
+let uID =0;
+
+     if (key && uID > 0 && !uidsAry.includes(uID) ) {
+       uidsAry.push(uID);
+       allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent); // Public key provided from input
+       }
+       else if (uID && !uidsAry.includes(uID) && uPublicKeyMlkem) {
+       uidsAry.push(uID);
+       allArmoredKeys.push(w3pgpConfig.public_key_mlkem); // MLKEM Public key saved on profile
+       }
+       else if (document.getElementById("pubKeyInfoMLKEM").textContent != '' && uID == 0) {
+        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
+       }
+       else if (document.getElementById("pubKeyInfoMLKEM").textContent != '' && uID > 0) {
+        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
+       }
+       else {
+        document.getElementById("myFileToBeCryptedMLKEM").value=null;
+        alert("Public key missing: Please ensure a key is saved to your profile or manually entered for encryption.");
+        return;
+       }
+
+  // console.log('uPublicKeyMlkem',uPublicKeyMlkem);
+  // console.log('allArmoredKeys',allArmoredKeys);
+
+    let totalBytes = 0;
+    for (let i = 0; i < files.length; i++) { totalBytes += files[i].size; }
+    const execYN = await checkMemorySafety(totalBytes);
+    if (!execYN) return;
+
+    // Preloader
+    if (fromTypedText < 1) {
+      document.getElementById("w3LoaderEncFiles").style.display = "inline-block";
+    } else {
+     document.getElementById("loader").style.display = "inline-block";
+    }
+
+    isDoingTask = 1;
+
+    const fileBuffers = [];
+    const transferables = [];
+   for (const f of files) {
+    const buf = await f.arrayBuffer();
+    fileBuffers.push({ name: f.name, buffer: buf });
+    transferables.push(buf);
+   }
+
+    document.getElementById("myFileToBeCryptedMLKEM").value=null;
+
+    // SHIP TO WORKER
+
+    encryptionWorker.postMessage({
+        action: 'MLKEM_ENCRYPT',
+        files: fileBuffers,
+        publicKeys: allArmoredKeys, // array
+        //library_url: w3pgpConfig.library_url,
+        senderDsaPrivateKeyHex: uPrivateKeyMldsa
+    }, transferables);
+
+    encryptionWorker.onmessage = (e) => {
+
+        if (e.data.type === 'DONE') {
+            let finalBlob = new Blob([e.data.result], { type: 'application/octet-stream' });
+            let u = URL.createObjectURL(finalBlob);
+
+            console.log('Encryption Done');
+
+            let sz = typeof e.data.result.length === "undefined" ? e.data.result.size : e.data.result.length;
+            document.querySelector(".ciphertext-value").textContent = sz + ' b';
+
+           /*
+           If it is a single (1) id check that it is not the same of the user doing the encryption
+           and in this case do not send out an email nor save the file into the server, provide only the download
+
+           --- Do not save the file into the server
+           --- Only return the file download link
+           */
+
+           if( uidsAry.length < 1 || uidsAry.length == 1 && Number(uidsAry[0]) === Number(uID) ){
+
+            let dl = document.getElementById("w3downloadEncryptedMsg");
+            dl.style.display = "block";
+            dl.href = u;
+            let tm = getDateX();
+            dl.download = '_' + tm + '_ml-kem-enc_msg.txt';
+            dl.textContent = 'Download Encrypted File';
+            /*document.getElementById("loader").style.display = "none";*/
+            document.querySelectorAll('#w3LoaderEncFiles, #loader').forEach(el => {
+              el.style.display = "none"; });
+
+            isDoingTask = 0;
+            document.getElementById("w3mlkemEncryptTxtInput").value = '';
+            return;
+
+           }
+
+        } else if (e.data.type === 'ERROR') {
+            document.querySelectorAll('#w3LoaderEncFiles, #loader').forEach(el => {
+              el.style.display = "none";
+            });
+            isDoingTask = 0;
+            alert("Worker Error: " + e.data.msg);
+        }
+    };
+}
+
+
+async function w3decryptMLKEM() {
+
+    if (isDoingTask > 0) return;
+    var someFileIsForDrawer = false;
+
+   // Remove previous if there are
+   document.querySelectorAll('.decryptedHybridDisplay').forEach(el => el.remove());
+   document.querySelector('.w3mypgp-trigger').classList.remove('ready');
+
+   w3mypgpEngine.removePrevBlobsFromRam();
+
+   if ( ! buffer ) {
+        const fileInput = document.getElementById("mlkemCryptedFile");
+        if (!fileInput.files.length) {
+        alert("No file selected.");
+        return "";
+       }
+
+        buffer = await fileInput.files[0].arrayBuffer();
+    }
+
+    if ( !buffer ) {
+        alert("No file selected.");
+        return "";
+    }
+
+   encryptionWorker = engineWorkerRestart();
+
+    document.getElementById("loader").style.display = "inline-block";
+    isDoingTask = 1;
+
+    // Ship to Worker
+
+    document.getElementById("mlkemCryptedFile").value = null;
+
+    //if( myprivKey == '' && uPrivateKeyMlkemLoaded != '' ){ myprivKey = uPrivateKeyMlkemLoaded; }
+    if( uPrivateKeyMlkemLoaded != '' ){ myprivKey = uPrivateKeyMlkemLoaded; }
+
+    document.getElementById("decryptLoader").style.display = "flex";
+
+    encryptionWorker.postMessage({
+        action: 'MLKEM_DECRYPT',
+        buffer: buffer,
+        privateKey: myprivKey,
+       // library_url: w3pgpConfig.library_url,
+        sender_pub_mldsa: uPubKeyMldsa,
+    }, [buffer]);
+
+    encryptionWorker.onmessage = (e) => {
+
+    if (e.data.type === 'DONE_DECRYPT') {
+
+      document.getElementById("decryptLoader").style.display = "none";
+
+       var options = { year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric" };
+       let dr = e.data.result.unpacked.archiveDate.toLocaleDateString(undefined, options); //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+       dr = dr.replace("-", " ").replace("-", " ").replace("--", " at ").replace(",", "");
+
+       document.getElementById("hybridDecryptResults").style.display = "block";
+       document.getElementById("mlkemEncrypionDate").insertAdjacentText("beforeend", dr);
+
+      if( e.data.result.isAuthentic ){
+        document.getElementById("decrypted-verified").textContent = `✅ Sender verified`;
+        document.getElementById("decrypted-verified").style.color = "#27ae60"; //
+      } else {
+        document.getElementById("decrypted-verified").textContent = `❌ Sender not verified`;
+        document.getElementById("decrypted-verified").style.color = "#FF0000";
+      }
+
+     let rfiles = e.data.result.unpacked;
+     var pd;
+     someFileIsForDrawer = false;
+
+     for (const fileObj of rfiles.files) {
+
+        let lastDot = fileObj.name.lastIndexOf(".");
+        let file_ext = lastDot !== -1 ? fileObj.name.substring(lastDot + 1).toLowerCase() : "";
+
+        let mime = mimeMap[file_ext] || 'application/octet-stream';
+
+    // DOWNLOAD DECRYPTED files links
+
+       var blob = new Blob([fileObj.data], { type: mime });
+       var url = URL.createObjectURL(blob);
+       activeBlobUrls.push(url);
+       var p = document.createElement("p");
+       p.classList.add("decryptedFile");
+       var a = document.createElement('a');
+       a.href = url;
+       a.download = fileObj.name;
+       a.textContent = fileObj.name;
+       p.append(a);
+       document.getElementById("hybridDecryptResults").append(p);
+
+    // START: DISPLAY DRAWER ON-RAM DECRYPTED files
+
+    // Actually only images, video, audio and text
+
+    // TODO: This will duplicate the RAM use and a sort of management so to
+    // display files only on click and revoke urls when file viewed should be added
+
+       /* ADD files results to display into the w3-drawer
+          Render only some specific mime types into the drawer:
+          imageMimeTypes videoMimeTypes audioMimeTypes
+          and txt. PDFs can be opened directly in the browser by clicking the download link (instead of being saved) */
+
+    // Drawer to display files content from RAM or only download links
+
+   if( document.getElementById("hybrid-decrypted-display-mode").value === 'drawer' )
+   {
+
+   if (imageMimeTypes.includes(mime)) {
+
+       // IMAGE
+    someFileIsForDrawer = true;
+    const imgBlob = new Blob([fileObj.data], { type: mime });
+    const imgUrl = window.URL.createObjectURL(imgBlob);
+    activeBlobUrls.push(imgUrl);
+
+    const img = new Image();
+
+    img.onload = () => {
+
+        img.style.display = "inline-block";
+        img.style.width = "auto";
+        img.style.height = "auto";
+        img.style.maxWidth = "100%";
+        let pd = document.createElement('div');
+        pd.classList.add("decryptedHybridDisplay");
+        pd.append(img);
+        document.getElementById("w3-drawer").append(pd);
+    };
+
+    img.onerror = () => console.error("Failed to load decrypted image.");
+    img.src = imgUrl;
+
+   } else if (videoMimeTypes.includes(mime)) {
+
+       // VIDEO
+    someFileIsForDrawer = true;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+
+        const dataUrl = e.target.result;
+        activeBlobUrls.push(dataUrl);
+
+        let v = document.createElement('video');
+        v.controls = true;
+        v.autoplay = false;
+        v.playsInline = true;
+        v.muted = true;
+        v.style.width = "auto";
+        v.style.maxWidth = "100%";
+        v.style.borderRadius = "8px";
+        v.style.marginTop = "10px";
+        v.src = dataUrl;
+        let pd = document.createElement('div');
+        pd.classList.add("decryptedHybridDisplay");
+        pd.append(v);
+        document.getElementById("w3-drawer").append(pd);
+    };
+
+    reader.readAsDataURL(new Blob([fileObj.data], { type: mime }));
+
+   } else if (audioMimeTypes.includes(mime)) {
+
+       // AUDIO
+       someFileIsForDrawer = true;
+
+       const reader = new FileReader();
+       reader.onload = (e) => {
+       const dataUrl = e.target.result;
+       activeBlobUrls.push(dataUrl);
+
+       let a = document.createElement("audio");
+       a.controls = true;
+       a.autoplay = false;
+       a.src = dataUrl;
+       let pd = document.createElement('div');
+       pd.classList.add("decryptedHybridDisplay");
+       pd.append(a);
+       document.getElementById("w3-drawer").append(pd);
+    };
+
+    reader.readAsDataURL(new Blob([fileObj.data], { type: mime }));
+
+     } else if (file_ext === 'txt') {
+
+       // TXT
+            someFileIsForDrawer = true;
+            let txt = new TextDecoder("utf-8").decode(fileObj.data); // UTF-8 to render emoticons
+            let pd = document.createElement('div');
+            pd.classList.add("decryptedHybridDisplay");
+            pd.textContent = txt;
+            //pd.style.backgroundColor = "rgba(0, 0, 0, 0.5)";// Matrix dark bg
+            pd.style.backgroundColor = "#FFF";
+            pd.style.color = "#000"; // Classic Matrix/Security green is #00ff88
+            pd.style.padding = "20px";
+            pd.style.borderRadius = "8px";
+            pd.style.border = "1px solid rgba(0, 255, 136, 0.2)";
+            pd.style.whiteSpace = "pre-wrap";
+            pd.style.fontFamily = "Fira Code,Verdana,monospace";
+            pd.style.fontSize = "1.2rem";
+            pd.style.overflowX = "auto";
+
+            document.getElementById("w3-drawer").append(pd);
+            txt = null;
+
+          }
+
+    // display on drawer or not
+    if(someFileIsForDrawer === true){
+     document.querySelector('.w3mypgp-trigger').classList.add('ready');
+    }
+
+  } // END display on drawer or not - if( document.getElementById("hybrid-decrypted-display-mode").value == 'drawer' )
+
+ } // END for (const fileObj of rfiles) {
+
+    if (encryptionWorker){
+       buffer = null;
+       encryptionWorker.terminate(); }
+       document.getElementById("loader").style.display = "none";
+       document.getElementById("decryptLoader").style.display = "none";
+     } else if (e.data.type === 'ERROR') {
+          buffer = null;
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("decryptLoader").style.display = "none";
+          document.getElementById("hybridDecryptResults").style.display = "none";
+          alert("Decryption Failed: " + e.data.msg);
+       }
+
+       isDoingTask = 0;
+
+
+    }; // END onMessage
+}
+
+
+function removePrevBlobsFromRam() {
+    const links = document.querySelectorAll('a[download], a[id*="download"], a[class*="download"]');
+
+    links.forEach(a => {
+        // Revoke the Blob URL if it exists in the href
+        if (a.href.startsWith('blob:')) {
+            URL.revokeObjectURL(a.href);
+            //a.remove();
+            //a.className
+        }
+
+     if (activeBlobUrls.length) {
+         activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+         activeBlobUrls.length = 0;
+     }
+
+       // Remove drawer pulse
+       document.querySelector('.w3mypgp-trigger').classList.remove('ready');
+       // Remove previous added files <p> <a> elements
+       //document.querySelectorAll('.pAESGCMdecryptedFiles').forEach(el => el.remove());
+       document.querySelectorAll('.decryptedHybridDisplay').forEach(el => el.remove());
+       document.querySelectorAll('.decryptedFile').forEach(el => el.remove());
+       document.getElementById("mlkemEncrypionDate").textContent = null;
+    });
+
+    // Clear internal URL Tracker
+    if (activeBlobUrls.length) {
+        activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+        activeBlobUrls.length = 0;
+    }
+}
+
+
+function globalReset() {
+
+    console.log("Performing some Global DOM Sweep...");
+
+    // Shred input, textarea, select
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(el => {
+        el.value = "";
+        if (el.type === 'file') el.value = null;
+        //el.dispatchEvent(new Event('change'));
+    });
+
+    // Shred all sensitive Href links (by ID or Class)
+    // Target links that have a 'download' attribute or specific classes
+    const links = document.querySelectorAll('a[download], a[id*="download"], a[class*="download"]');
+    links.forEach(a => {
+        // Revoke the Blob URL if it exists in the href
+        if (a.href.startsWith('blob:')) {
+            URL.revokeObjectURL(a.href);
+            a.remove();
+        }
+    });
+
+    // Clear internal "Ghost" URL Tracker
+    if (activeBlobUrls.length) {
+        activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+        activeBlobUrls.length = 0;
+    }
+
+    // Wipe the Keys and Engine and more
+
+    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
+    uPrivateKeyMldsa,allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
+
+    if (encryptionWorker) encryptionWorker.terminate();
+
+   (async () => {
+
+    await forceMemoryScrubSafe(500);
+    window.sessionStorage.clear();
+    window.localStorage.clear();
+
+    // Finish remove links elements
+    document.querySelectorAll('.decryptedFile').forEach(el => el.remove());
+    document.querySelectorAll('.decryptedHybridDisplay').forEach(el => el.remove());
+
+    document.getElementById("mlkemEncrypionDate").textContent = null;
+    document.getElementById("mlkemEncrypionDate").style.display = "none";
+
+    document.getElementById("pubKeyState").textContent='Public key not loaded';
+    document.getElementById("pubKeyState").setAttribute("style", "");
+    document.getElementById("privKeyState").textContent='Private key not loaded';
+    document.getElementById("privKeyState").setAttribute("style", "");
+    document.getElementById("pubKeyInfoMLKEM").textContent=null;
+    document.getElementById("privKeyInfoMLKEM").textContent=null;
+    document.getElementById("pubKeyInfoMLKEM").textContent=null;
+    document.getElementById("privKeyInfoMLKEM").textContent=null;
+    document.getElementById("myFileToBeCryptedMLKEM").value = null;
+    document.querySelector(".ciphertext-value").textContent = '';
+    document.querySelector('.w3mypgp-trigger').classList.remove('ready');
+
+    if (globalThis.gc) { globalThis.gc(); }
+
+    console.log("Global Sweep Complete. The workstation is 'Cold'.");
+    alert("⚠️ SYSTEM WIPE: inputs, keys, and temporary links have been destroyed. RAM overwritten. To complete the RAM cleanup, you may now close this Browser tab.");
+
+     // window.location.replace("about:blank"); ram javascript in Firefox
+     /*if(/Firefox|FxiOS/i.test(navigator.userAgent)){
+      window.location.replace("about:blank"); // the Firefox "Nuclear Option" for clearing. Replace the page.
+     } else { location.reload(); // on others browsers will not work or cause worst issues like page-copy on ram
+             }*/
+
+    location.reload();
+
+   })();
+
+}
+
+  // --- #cinciaKeys VIEW TEMPLATES ---
+  function overlaySplitViewHTML()
+{
+  //const overlaySplitViewHTML = `
+  let overlaySplitViewHTML = `
+    <h2>Split Key Mode 🐦</h2>
+    <p style="color: #94a3b8;text-align: center; margin-bottom: 10px;">Load the private key file and enter your custom secret phrase.</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;align-items: center">
+        <label style="font-weight: 600; color: #cbd5e1;">Load Private Key (.txt):</label>
+        <input type="file" id="key-file" accept=".txt" style="width: 100%; padding: 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; outline: none;">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label><span style="font-weight: 600; color: #cbd5e1;">Enter obfuscation phrase</span><br><span style="color: #94a3b8;">(Mixed case for higher entropy)</span></label>
+        <input type="text" id="secret-phrase" placeholder="The Chickadee hides its Secret here" style="font-size:1.6rem;padding: 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; outline: none;">
+    </div>
+    <button id="process-split-btn" style="background-color: #0ea5e9; color: #ffffff; border: none; padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 10px;" onmouseover="this.style.backgroundColor='#0284c7'" onmouseout="this.style.backgroundColor='#0ea5e9'">Process & Save</button>
+`;
+return overlaySplitViewHTML;
+}
+
+  function overlayRebuildViewHTML()
+{
+let overlayRebuildViewHTML = `
+    <h2>Rebuild Key Mode <span style="display: inline-block; transform: scaleX(-1);">🐦</span></h2>
+    <p style="color: #94a3b8;text-align: center; margin-bottom: 10px;">Load your Nest file and enter your phrase to recover the key.</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;align-items: center">
+        <label style="font-weight: 600; color: #cbd5e1;">Load Nest private key file (.txt):</label>
+        <input type="file" id="nest-file" accept=".txt" style="width: 100%; padding: 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; outline: none;">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-weight: 600; color: #cbd5e1;">Enter Recovery Phrase:</label>
+        <input type="text" id="rebuild-phrase" placeholder="" style="font-size:1.6rem;padding: 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; outline: none;">
+    </div>
+    <button id="process-rebuild-btn" style="background-color: #0ea5e9; color: #ffffff; border: none; padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 10px;" onmouseover="this.style.backgroundColor='#0284c7'" onmouseout="this.style.backgroundColor='#0ea5e9'">Rebuild Private Key</button>
+`;
+return overlayRebuildViewHTML;
+}
+
+// --- Copyright axe3.com
+// --- CinciaKeys MATH
+function overlayConvertPhraseToNumbers(phrase) {
+    const trailingNumbersMatch = phrase.match(/\s+(\d+)$/);
+    let finalNumbers = "";
+    let cleanPhrase = phrase;
+
+    if (trailingNumbersMatch) {
+        finalNumbers = trailingNumbersMatch;
+        cleanPhrase = phrase.substring(0, trailingNumbersMatch.index);
+    }
+
+    cleanPhrase = cleanPhrase.replace(/[^a-zA-Z\s]/g, '');
+
+    const textLengthWithoutSpaces = cleanPhrase.replace(/\s/g, '').length;
+    if (textLengthWithoutSpaces < 10) {
+        alert("Invalid phrase! The text must contain at least 10 letters.");
+        return null;
+    }
+    if (textLengthWithoutSpaces > 100) {
+        alert("Invalid phrase! The text must contain a maximum of 100 letters.");
+        return null;
+    }
+
+    let resultNumbers = [];
+    let i = 0;
+
+    while (i < cleanPhrase.length) {
+        let char = cleanPhrase[i];
+        if (char === ' ') { i++; continue; }
+
+        if (char >= 'A' && char <= 'Z') {
+            resultNumbers.push(char.charCodeAt(0) - 15);
+        } else if (char >= 'a' && char <= 'z') {
+            resultNumbers.push(char.charCodeAt(0) - 96);
+        }
+        i++;
+    }
+
+    if (!finalNumbers || finalNumbers.length < 4) {
+        let totalSum = resultNumbers.reduce((acc, curr) => acc + (typeof curr === 'number' ? curr : 0), 0);
+        let deterministicYear = (totalSum * 17) % 10000;
+        finalNumbers = String(deterministicYear).padStart(4, '0');
+    }
+
+    return { keySequence: resultNumbers, savedFinalNumber: finalNumbers };
+}
+
+function overlayGenerateFakeHex(length) {
+
+  try {
+    const arr = new Uint8Array(Math.ceil(length / 2));
+    crypto.getRandomValues(arr);
+    let result = "";
+    for (let i = 0; i < arr.length; i++) {
+     result += arr[i].toString(16).padStart(2, '0');
+    } return result.substring(0, length);
+
+  } catch (error) {
+        //console.error(error);
+        alert('⚠️ Are you sure you uploaded the correct file for this screen? (single ML-KEM 1024 private key)\n\n'+error);
+      }
+
+}
+
+
+// --- #cinciaKeys SPLIT ENGINE ---
+function bindOverlaySplitLogic() {
+    const btn = document.getElementById('process-split-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        const fileInput = document.getElementById('key-file');
+        const phraseInput = document.getElementById('secret-phrase').value;
+
+        if (!fileInput.files || fileInput.files.length === 0 || !phraseInput.trim()) {
+            alert("Please select your key file and enter a phrase.");
+            return;
+        }
+
+        const conversionResult = overlayConvertPhraseToNumbers(phraseInput);
+        if (conversionResult === null) return;
+
+        const fullNumberString = conversionResult.savedFinalNumber;
+        let firstIndex = parseInt(fullNumberString.substring(0, 2), 10) % 97;
+        let secondIndex = parseInt(fullNumberString.substring(2, 4), 10) % 97;
+
+        if (firstIndex === secondIndex) {
+            secondIndex = (secondIndex + 1) % 97;
+        }
+
+        const reader = new FileReader();
+        reader.readAsText(fileInput.files[0]);
+
+        reader.onload = function(e) {
+            let rawText = e.target.result;
+            
+        let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
+
+        let privateMatches = rawText.match(privateKeyRegex);
+
+        let pk = privateMatches ? privateMatches[1].trim() : '';
+
+        let hexString = pk.replace(/\s/g, '').toLowerCase();
+
+            if (hexString.length === 0) {
+                alert("Error: Key file payload is empty or is not a key.");
+                return;
+            }
+
+            const halfLength = Math.floor(hexString.length / 2);
+            let realFirstHalf = hexString.substring(0, halfLength);
+            let realSecondHalf = hexString.substring(halfLength);
+
+            const seqArray = conversionResult.keySequence;
+            const seqHalfLength = Math.ceil(seqArray.length / 2);
+            const firstSeqHalf = seqArray.slice(0, seqHalfLength);
+            const secondSeqHalf = seqArray.slice(seqHalfLength);
+
+            function obfuscateSegment(halfStr, seqHalf) {
+                let chars = halfStr.split('');
+                let currentPosition = 0;
+                const hexChars = "0123456789abcdefghilmanoprstuvzwyjkx";
+
+                seqHalf.forEach((num) => {
+                    currentPosition = (currentPosition + num) % chars.length;
+                    let originalChar = chars[currentPosition];
+                    let originalValue = hexChars.indexOf(originalChar);
+                    if (originalValue === -1) return;
+
+                    let obfuscatedValue = (originalValue ^ num) % 16;
+                    if (obfuscatedValue < 0) obfuscatedValue += 16;
+                    chars[currentPosition] = hexChars[obfuscatedValue];
+                });
+                return chars.join('');
+            }
+
+            realFirstHalf = obfuscateSegment(realFirstHalf, firstSeqHalf);
+            realSecondHalf = obfuscateSegment(realSecondHalf, secondSeqHalf);
+
+            const chickadeeNest = new Array(97);
+            for (let i = 0; i < 97; i++) {
+                if (i === firstIndex) {
+                    chickadeeNest[i] = realFirstHalf;
+                } else if (i === secondIndex) {
+                    chickadeeNest[i] = realSecondHalf;
+                } else {
+                    chickadeeNest[i] = overlayGenerateFakeHex(halfLength);
+                }
+            }
+
+            const outputBlob = new Blob([chickadeeNest.join('\n')], { type: 'text/plain' });
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(outputBlob);
+            downloadLink.download = "BPQ_PrivateKey_nest.txt";
+            downloadLink.click();
+        };
+    });
+}
+
+ // --- #cinciaKeys REBUILD ENGINE ---
+ function bindOverlayRebuildLogic() {
+    const btn = document.getElementById('process-rebuild-btn');
+
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        const fileInput = document.getElementById('nest-file');
+        const phraseInput = document.getElementById('rebuild-phrase').value;
+        const workspaceArea = document.getElementById('overlay-dynamic-content');
+
+        if (!fileInput.files || fileInput.files.length === 0 || !phraseInput.trim()) {
+            alert("Please load your Nest file and type your recovery phrase.");
+            return;
+        }
+
+        const conversionResult = overlayConvertPhraseToNumbers(phraseInput);
+        if (conversionResult === null) return;
+
+        const fullNumberString = conversionResult.savedFinalNumber;
+        let firstIndex = parseInt(fullNumberString.substring(0, 2), 10) % 97;
+        let secondIndex = parseInt(fullNumberString.substring(2, 4), 10) % 97;
+
+        if (firstIndex === secondIndex) {
+            secondIndex = (secondIndex + 1) % 97;
+        }
+
+        const reader = new FileReader();
+        reader.readAsText(fileInput.files[0]);
+
+        reader.onload = function(e) {
+            const lines = e.target.result.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            if (lines.length < 97) {
+                alert("Invalid Nest file! It does not contain 97 segments.");
+                return;
+            }
+
+            let scrambledFirstHalf = lines[firstIndex];
+            let scrambledSecondHalf = lines[secondIndex];
+
+            const seqArray = conversionResult.keySequence;
+            const seqHalfLength = Math.ceil(seqArray.length / 2);
+            const firstSeqHalf = seqArray.slice(0, seqHalfLength);
+            const secondSeqHalf = seqArray.slice(seqHalfLength);
+
+            const hexChars = "0123456789abcdef";
+
+            function deobfuscateSegment(halfStr, seqHalf) {
+                let chars = halfStr.split('');
+                let currentPosition = 0;
+
+                seqHalf.forEach((num) => {
+                    currentPosition = (currentPosition + num) % chars.length;
+                    let markedChar = chars[currentPosition];
+                    let targetValue = hexChars.indexOf(markedChar);
+                    if (targetValue === -1) return;
+
+                    let originalValue = (targetValue ^ num) % 16;
+                    if (originalValue < 0) originalValue += 16;
+                    chars[currentPosition] = hexChars[originalValue];
+                });
+                return chars.join('');
+            }
+
+            let recoveredFirstHalf = deobfuscateSegment(scrambledFirstHalf, firstSeqHalf);
+            let recoveredSecondHalf = deobfuscateSegment(scrambledSecondHalf, secondSeqHalf);
+            let completeHexKey = recoveredFirstHalf + recoveredSecondHalf;
+
+            // Detect which key has been rebuilt based on key length
+            let whicKey = 0;
+            let keyIS = '';
+            const cleanHex = completeHexKey.replace(/^0x/i, '').replace(/[\s:]/g, '');
+            const keySizeInBytes = cleanHex.length / 2;
+
+          if (keySizeInBytes === 4896) {
+              //console.log("✅ Valid ML-DSA-87 Private Key length");
+              whicKey = 1; // DSA
+              uPrivateKeyMldsa = completeHexKey;
+               document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
+               document.getElementById("priv-mlkem-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
+          } else if (keySizeInBytes === 3168) {
+          	 whicKey = 2; // KEM
+             //console.log("✅ Valid ML-KEM-1024 Private Key length");
+             // Assign to uPrivateKeyMlkemLoaded and myprivKey the rebuilt key value
+             uPrivateKeyMlkemLoaded = myprivKey = completeHexKey;
+              document.getElementById("privKeyState").textContent='Private key loaded';
+              document.getElementById("privKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+              document.getElementById("privKeyInfoMLKEM").textContent='Private key loaded but not displayed';
+
+            } else {
+               console.log("❌ Unknown key length or format error.");
+               return;
+             }
+             
+            let pemFormattedKey = "-----BEGIN PRIVATE KEY-----\n" + completeHexKey + "\n-----END PRIVATE KEY-----";
+
+
+            if(whicKey > 1){
+             keyIS = "<h2>ML-KEM Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
+            } else {
+            	keyIS = "<h2>ML-DSA Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
+            }
+            
+            
+            workspaceArea.innerHTML = keyIS +
+                "<p style='color:#94a3b8; font-size:0.95rem; text-align:center;'>Your key has been fully reconstructed with standard boundaries.</p>" +
+                "<div style='display:flex; flex-direction:column; gap:8px; width:100%;'>" +
+                    "<textarea id='overlay-copy-key-box' style='width:100%; height:140px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:8px; padding:12px; font-family:monospace; resize:none;' readonly>" + pemFormattedKey + "</textarea>" +
+                "</div>" +
+                "<button id='overlay-copy-btn' style='background:#334155; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:5px;'>Copy to Clipboard</button>" +
+                "<button id='overlay-download-key-btn' style='background:#0ea5e9; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:10px;'>Download .txt Key File</button>";
+
+            document.getElementById('overlay-copy-btn').addEventListener('click', () => {
+                let textarea = document.getElementById('overlay-copy-key-box');
+                textarea.select();
+                navigator.clipboard.writeText(textarea.value);
+                alert("Copied to clipboard!");
+            });
+
+            document.getElementById('overlay-download-key-btn').addEventListener('click', () => {
+                let outputBlob = new Blob([pemFormattedKey], { type: 'text/plain' });
+                let downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(outputBlob);
+                downloadLink.download = "recovered_private_key.txt";
+                downloadLink.click();
+            });
+            
+            completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '00000000000000000000000';
+            completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '';
+        };
+    });
+ }
+
+
+   // Expose only the necessary. Ensures that even if another script (like a malicious browser extension) is running on the page, it cannot access variables
+    window.w3mypgpEngine = {
+        w3encryptWithtMLKEM: () => w3encryptMLKEM(mypubKey, fromTypedText),
+        w3decryptWithtMLKEM: () => w3decryptMLKEM(),
+        loadMLKEMkeys: () => loadMLKEMkeys(),
+        getKeys: () => getKeys(),
+        senderMldsaPrivLoad: () => senderMldsaPrivLoad(),
+        senderMldsaPubLoad: () => senderMldsaPubLoad(),
+        globalReset: () => globalReset(),
+        removePrevBlobsFromRam: () => removePrevBlobsFromRam(),
+        bindOverlaySplitLogic: () => bindOverlaySplitLogic(),
+        overlaySplitViewHTML: () => overlaySplitViewHTML(),
+        overlayRebuildViewHTML: () => overlayRebuildViewHTML(),
+        bindOverlayRebuildLogic: () => bindOverlayRebuildLogic(),
+
+    };
+
+})(); // END (function() { WORKER
+
+
+
+// Display the Drawer or not based on hybrid-decrypted-display-mode selected
+document.getElementById("hybrid-decrypted-display-mode").addEventListener("change", function(e){
+   if(e.target.value === 'download'){
+    document.getElementById("w3-drawer").setAttribute("style", "display:none;");
+    document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:none;");
+   } else {
+      document.getElementById("w3-drawer").setAttribute("style", "display:block;");
+      document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:block;");
+    }
+});
+
+document.getElementById("destroySessionHybrid").addEventListener("click", function(){
+  w3mypgpEngine.globalReset();
+});
+
+
+const fileInputPubK = document.querySelector('input[name="myPublicKeyTXT"]');
+const fileInputPrivK = document.querySelector('input[name="myPrivateKeyTXT"]');
+const fileInputToDecrypt = document.querySelector('input[name="mlkemCryptedFile"]');
+
+const content = document.querySelector(".content");
+
+document.querySelector(".encrypt-button").addEventListener("click", () => {
+  w3mypgpEngine.removePrevBlobsFromRam();
+  fromTypedText=1;// from typed text
+  w3mypgpEngine.w3encryptWithtMLKEM(mypubKey,fromTypedText);
+});
+
+
+document.getElementById("mlkemCryptedFile").addEventListener("change", function(){
+  w3mypgpEngine.removePrevBlobsFromRam();
+  w3mypgpEngine.w3decryptWithtMLKEM();
+});
+
+
+document.getElementById("myFileToBeCryptedMLKEM").addEventListener("change", function(){
+  w3mypgpEngine.removePrevBlobsFromRam();
+  fromTypedText=0;// from files
+  encryptType='mlkem';
+  w3mypgpEngine.w3encryptWithtMLKEM(mypubKey,fromTypedText);
+});
+
+document.getElementById("myPubPrivKeyTXT").addEventListener("change", function(){
+  w3mypgpEngine.loadMLKEMkeys();
+});
+
+document.getElementById("senderMldsaPrivLoad").addEventListener("change", function(){
+  w3mypgpEngine.senderMldsaPrivLoad();
+});
+
+document.getElementById("senderMldsaPubLoad").addEventListener("change", function(){
+  w3mypgpEngine.senderMldsaPubLoad();
+});
+
+
+async function checkMemorySafety(totalBytes) {
+    const MB_LIMIT = 300 * 1024 * 1024; // 300MB old smartphones
+    const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+
+    // Detect mobile
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // Force a warning for ANY mobile device if selected files are over 300MB
+    if (isMobile && totalBytes > MB_LIMIT) {
+        return confirm('MOBILE WARNING:\n\nSelected file(s) size is '+totalMB+' MB.\n\nMobile memory limits may cause this page to refresh and fail on older devices.\n\nProceed anyway?');
+    }
+
+    // Browser Quota Fallback (For Desktop/High-end)
+    if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        if (est.quota && totalBytes > (est.quota * 0.1)) { // Stricter 10% for desktop
+             return confirm('DISK SPACE WARNING:\n\nWarning: Archive size exceeds typical browser memory quotas. This may cause the page to refresh and the process to fail. Proceed anyway?\n\nContinue?');
+        }
+    }
+
+    return true;
+}
+
+ function getDateX(){
+  const d = new Date();
+  const options = { year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric" };
+  let dr = d.toLocaleDateString(undefined, options); //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+  dr = dr.replace(/ |,/g, '-');
+  return dr;
+ }
+
+
+function getLargeRandomValues(size) {
+    const arr = new Uint8Array(size);
+    const maxChunk = 65536; // 64KB limit
+    for (let i = 0; i < size; i += maxChunk) {
+        const chunkSize = Math.min(maxChunk, size - i);
+        // Fill only the specific slice of the array
+        crypto.getRandomValues(arr.subarray(i, i + chunkSize));
+    }
+ return arr;
+}
+
+async function forceMemoryScrubSafe(targetMB = 256) {
+    const junkBase = getLargeRandomValues(1024 * 1024); // 1MB Seed
+    let memoryVault = [];
+    const startTime = performance.now();
+
+    for (let i = 0; i < targetMB; i++) {
+        const loopStart = performance.now();
+
+        // Physical Allocation
+        memoryVault.push(junkBase.slice());
+
+        // Latency Check (The "Swap" Detector)
+        // If a single 1MB allocation takes > 50ms, the OS is likely swapping to disk.
+        const loopEnd = performance.now();
+        if (loopEnd - loopStart > 50) {
+            console.warn("High latency detected! Stopping scrub to prevent Disk Swap leak.");
+            alert("High latency detected! Stopping scrub to prevent Disk Swap.");
+            break;
+        }
+
+        // Force CPU interaction to prevent "Dead Code Elimination"
+        if (i % 20 === 0) {
+            const _ = memoryVault[i][0] ^ memoryVault[i][1024];
+            // Small pause to let the UI breathe and check for system lag
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+
+    // Final Wipe and Release
+    for (let block of memoryVault) { block.fill(0); }
+    memoryVault = null;
+    junkBase.fill(0);
+
+    const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
+    console.log('Forensic scrub finished in '+totalTime+'s. Key fragments overwritten.');
+}
+
+
+// Detect user inactivity time (auto session reset)
+function resetInactivityTimer() {
+
+    // Clear the previous pending wipe
+    clearTimeout(inactivityTimeout);
+    // Then
+    if (isDoingTask > 0) return;
+
+    // Schedule a new wipe
+    inactivityTimeout = setTimeout(() => {
+        console.log("Inactivity detected: Privacy Cleanup Initiated.");
+        //alert("Inactivity detected: Privacy Cleanup Initiated.");
+
+        w3mypgpEngine.globalReset();
+
+        // Optional: notify the user or refresh the UI
+        console.log("Session cleared due to inactivity.");
+        //window.location.reload(); // it is within globalReset()
+    }, INACTIVITY_LIMIT);
+}
+
+// This activate the auto reset
+// Listen for any sign of life
+/*
+['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer, { passive: true });
+});
+// Start the clock immediately on load
+resetInactivityTimer();
+*/
+// END auto reset
+
+// Top main buttons
+const buttons = document.querySelectorAll('.interface button');
+
+buttons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Remove the active class from all buttons
+        buttons.forEach(b => b.classList.remove('w3-active'));
+
+        // Add the active class to the one we just clicked
+        this.classList.add('w3-active');
+    });
+});
+
+/* Display html page mode */
+document.getElementById("generateInterface").addEventListener("click", function (e) {
+  document.getElementById("wrapEncrypt").setAttribute("style", "display:none;");
+  document.getElementById("wrapDecrypt").setAttribute("style", "display:none;");
+  document.querySelector(".decrypted").setAttribute("style", "display:none;");
+  document.getElementById('w3EncryptedLoaded').setAttribute("style","display:none;");
+  document.getElementById("w3_wrap_link-decrypt-form").setAttribute("style", "display:none;");
+  document.getElementById("w3GenCryptoMLKEMKeys").setAttribute("style", "display:block;");
+
+  document.getElementById("w3loadKeys").setAttribute("style", "display:none;");
+  document.getElementById("w3mypgpCryptoExplain").setAttribute("style", "display:flex;");
+  document.getElementById("btnOpenCinciaKeys").setAttribute("style", "display:block;");
+
+  document.getElementById("w3-drawer").setAttribute("style", "display:none;");
+  document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:none;");
+  //document.getElementById("w3-search-wrapper").setAttribute("style", "display:none;");
+  document.getElementById("hybridDecryptResults").setAttribute("style", "display:none;");
+  document.getElementById("select-display-wrapper").setAttribute("style", "display:none;");
+  document.getElementById("save-mlkem-status").setAttribute("style", "display:none;");
+  document.getElementById("wrapGenCryptoMLKEMKeys").setAttribute("style", "display:flex;");
+});
+document.getElementById("cryptInterface").addEventListener("click", function (e) {
+  document.getElementById("w3GenCryptoMLKEMKeys").setAttribute("style", "display:none;");
+  document.querySelector(".decrypted").setAttribute("style", "display:none;");
+  document.getElementById('w3EncryptedLoaded').setAttribute("style","display:none;");
+  document.getElementById("w3_wrap_link-decrypt-form").setAttribute("style", "display:none;");
+  document.querySelector(".wrap1-cryptDecryptControls").setAttribute("style", "inline-block;");
+  document.getElementById("mlkemEncrypionDate").innerText = null;
+  document.querySelector(".cCenterD").setAttribute("style", "display:none;");
+  document.querySelector(".cCenter").setAttribute("style", "display:block;");
+  document.getElementById("wrapEncrypt").setAttribute("style", "display:flex;");
+  document.getElementById("wrapDecrypt").setAttribute("style", "display:none;");
+  document.getElementById("wrapGenCryptoMLKEMKeys").setAttribute("style", "display:none;");
+
+
+  document.getElementById("mlkemCryptedFile").value = null;
+
+  document.getElementById("w3wrapPubKeyInfo").setAttribute("style", "display:block;");
+  document.getElementById("w3wrapPrivKeyInfo").setAttribute("style", "display:none;");
+  document.getElementById("save-mlkem-status").setAttribute("style", "display:none;");
+  document.getElementById("wrapGenCryptoKeys").setAttribute("style", "display:none;");
+
+  document.getElementById("w3-drawer").setAttribute("style", "display:none;");
+  document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:none;");
+  document.getElementById("hybrid-decrypted-display-mode").setAttribute("style", "display:none;");
+//  document.getElementById("w3-search-wrapper").setAttribute("style", "display:flex;");
+  document.getElementById("hybridDecryptResults").setAttribute("style", "display:none;");
+  document.getElementById("select-display-wrapper").setAttribute("style", "display:none;");
+  document.getElementById("w3loadKeys").setAttribute("style", "display:block;");
+
+
+
+});
+document.getElementById("decryptInterface").addEventListener("click", function (e) {
+  document.getElementById("w3GenCryptoMLKEMKeys").setAttribute("style", "display:none;");
+  document.querySelector(".wrap1-cryptDecryptControls").setAttribute("style", "display:none;");
+  document.querySelector(".cCenter").setAttribute("style", "display:block;");
+  document.querySelector(".cCenterD").setAttribute("style", "display:block;");
+  document.querySelector(".decrypted").setAttribute("style", "display:block;");
+  document.getElementById("wrapEncrypt").setAttribute("style", "display:none;");
+  document.getElementById("wrapDecrypt").setAttribute("style", "display:block;");
+  document.getElementById("wrapGenCryptoMLKEMKeys").setAttribute("style", "display:none;");
+
+  document.getElementById("w3mypgpCryptoExplain").setAttribute("style", "display:flex");
+  document.getElementById("wrapGenCryptoKeys").setAttribute("style", "display:none;");
+  document.getElementById("w3_wrap_link-decrypt-form").setAttribute("style", "display:none;");
+
+  document.getElementById("w3wrapPubKeyInfo").setAttribute("style", "display:none");
+  document.getElementById("w3wrapPrivKeyInfo").setAttribute("style", "display:block");
+  document.getElementById("save-mlkem-status").setAttribute("style", "display:none;");
+
+  document.getElementById("hybrid-decrypted-display-mode").setAttribute("style", "display:inline-block");
+  document.getElementById("w3-drawer").setAttribute("style", "display:block");
+  document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:block");
+//document.getElementById("w3-search-wrapper").setAttribute("style", "display:none");
+
+  document.getElementById("select-display-wrapper").setAttribute("style", "display:inline-block");
+  document.getElementById("w3loadKeys").setAttribute("style", "display:block;");
+});
+
+/* END Display html page mode */
+
+
+// Reset values on page load
+
+document.getElementById("pubKeyInfoMLKEM").textContent='';
+
+document.getElementById("privKeyInfoMLKEM").textContent='';
+document.getElementById("w3mlkemEncryptTxtInput").value=null;
+document.querySelector(".cCenterD").setAttribute("style", "display:none;");
+document.querySelector(".decrypted").setAttribute("style", "display:none;");
+document.getElementById("w3GenCryptoMLKEMKeys").setAttribute("style", "display:none;");
+document.getElementById("w3downloadEncryptedMsg").setAttribute("style", "display:none;");
+
+document.getElementById("w3-drawer").setAttribute("style", "display:none;");
+document.querySelector(".w3mypgp-trigger").setAttribute("style", "display:none;");
+document.getElementById("hybrid-decrypted-display-mode").value = 'drawer';
+document.getElementById("hybrid-decrypted-display-mode").setAttribute("style", "display:none;");
+document.getElementById("hybridDecryptResults").setAttribute("style", "display:none;");
+document.getElementById("myFileToBeCryptedMLKEM").value=null;
+
+// Change the text when buttons encrypt/decrypt clicked
+const textElement = document.querySelector('#w3loadKeys .cText');
+const cryptBtn = document.getElementById('cryptInterface');
+const decryptBtn = document.getElementById('decryptInterface');
+
+  if (textElement) textElement.textContent = 'Load Public ML-KEM key';
+
+cryptBtn.addEventListener('click', () => {
+  if (textElement) textElement.textContent = 'Load Public ML-KEM key';
+});
+
+decryptBtn.addEventListener('click', () => {
+  if (textElement) textElement.textContent = 'Load Private ML-KEM key';
+});
+
+
+// The CinciaKeys Overlay Screen START
+// Wait for DOM content to be fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+    const btnOpen = document.getElementById('btnOpenCinciaKeys');
+    const btnClose = document.getElementById('btnCloseCinciaKeys');
+    const overlay = document.getElementById('cinciaKeysOverlay');
+    overlay.style.display = 'none';
+
+    // Open the CinciaKeys Overlay Screen
+    if (btnOpen && overlay) {
+        btnOpen.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default form action layout triggers
+            overlay.style.display = 'flex';
+            // Trigger the initial Split view rendering layout
+            if (typeof initOverlayNavigation === "function") {
+                initOverlayNavigation();
+            }
+        });
+    }
+
+    // Close the CinciaKeys Overlay Screen
+    if (btnClose && overlay) {
+        btnClose.addEventListener('click', () => {
+            overlay.style.display = 'none';
+        });
+    }
+
+        // Close the overlay when clicking OUTSIDE the tool container
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+                   if (e.target === overlay || e.target === overlay.firstElementChild) {
+                overlay.style.display = 'none';
+            }
+        });
+    }
+});
+// The CinciaKeys Overlay Screen END
+
+// --- #cinciaKeys OVERLAY TABS NAVIGATION ---
+function initOverlayNavigation() {
+    const tabSplit = document.getElementById('overlay-btn-split');
+    const tabRebuild = document.getElementById('overlay-btn-rebuild');
+    const workspace = document.getElementById('overlay-dynamic-content');
+
+    // Default configuration upon launch: show Split tab
+    tabSplit.style.backgroundColor = "#0ea5e9";
+    tabSplit.style.color = "#ffffff";
+    tabRebuild.style.backgroundColor = "transparent";
+    tabRebuild.style.color = "#94a3b8";
+    workspace.innerHTML = w3mypgpEngine.overlaySplitViewHTML(); //overlaySplitViewHTML;
+    w3mypgpEngine.bindOverlaySplitLogic();
+
+    // Listener when clicking the Split navigation tab
+    tabSplit.addEventListener('click', () => {
+        tabSplit.style.backgroundColor = "#0ea5e9";
+        tabSplit.style.color = "#ffffff";
+        tabRebuild.style.backgroundColor = "transparent";
+        tabRebuild.style.color = "#94a3b8";
+        workspace.style.backgroundColor = "#1e293b";
+        workspace.innerHTML = w3mypgpEngine.overlaySplitViewHTML(); //workspace.innerHTML = overlaySplitViewHTML;
+        w3mypgpEngine.bindOverlaySplitLogic(); //bindOverlaySplitLogic(); // Re-bind split click actions
+    });
+
+    // Listener when clicking the Rebuild navigation tab
+    tabRebuild.addEventListener('click', () => {
+
+        tabRebuild.style.backgroundColor = "#0ea5e9";
+        tabRebuild.style.color = "#ffffff";
+        workspace.style.backgroundColor = "#27364E";
+        tabSplit.style.backgroundColor = "transparent";
+        tabSplit.style.color = "#94a3b8";
+        workspace.innerHTML = w3mypgpEngine.overlayRebuildViewHTML();
+        w3mypgpEngine.bindOverlayRebuildLogic();
+    });
+}
+
+
+
+
+</script>
+
+<div class="w3mypqBott" style="text-align:center;padding:20px">
+    <h2 style="text-align:center;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color:#FFFFFF;
+        margin: 0;"><a href="https://www.axew3.com/w3/bennypq/" target="_blank">HOW TO USE & DOWNLOAD</a></h2>
+
+<br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br>🔐❤️ Built for absolute Privacy – <b><a href="http://www.paypal.me/alessionanni/" target="_blank" rel="noreferrer noopener"><strong>Your privacy matters, Support the tools that protect it</strong></a></b><br><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br></div>
+
+<h2 style="text-align:center;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color:#000000;
+        margin:0;">2.0.0 (C) 2026 axew3.com</h2>
+
+
+<noscript>
+    <style>
+      .w3noscript-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: white; z-index: 100000; display: flex;
+        align-items: center; justify-content: center; text-align: center;
+      }
+      .w3noscript-box {
+        padding: 50px; border: 5px solid red;
+      }
+    </style>
+    <div class="w3noscript-overlay">
+      <div class="w3noscript-box">
+        <h1 style="color: red;">JAVASCRIPT REQUIRED</h1>
+        <h3>The w3mypgp encryption tool <strong>cannot work</strong> without JavaScript.</h3>
+        <h3>Enable it in your browser settings to continue.</h3>
+      </div>
+    </div>
+</noscript>
+
+
+</body>
+</html>
