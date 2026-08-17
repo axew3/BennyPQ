@@ -28,10 +28,11 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 
 ## 🛠️ Usage & Workflow
 
-1.  **Download & Launch**: Clone the repository and open `BPQ.html` in your browser.
+1.  **Download & Launch**: Open `BPQ.html` in your browser.
 2.  **Generate Keys**: Create your quantum-resistant ML-KEM and ML-DSA key pairs.
 3.  **Obfuscate with Cincia**: Pass your private key through the Cincia Vault screen to safely hide its footprint.
 4.  **Encrypt / Decrypt**: Secure your data using local AEAD encryption layers or verify digital signatures effortlessly.
+5.  See [HOW TO AND DOWNLOAD](https://www.axew3.com/w3/bennypq/)
 
 ---
 
