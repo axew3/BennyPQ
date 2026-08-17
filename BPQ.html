@@ -2550,8 +2550,8 @@ function globalReset() {
 
     // Wipe the Keys and Engine and more
 
-    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
-    uPrivateKeyMldsa,allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
+    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
+    uPrivateKeyMldsa,uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
 
     if (encryptionWorker) encryptionWorker.terminate();
 
