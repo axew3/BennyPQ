@@ -2092,80 +2092,6 @@ async function senderMldsaPubLoad(){
 
 }
 
-
-
-async function recipientsSendEmails(unames,downloadLink){
-
-    try {
-        const response = await fetch(w3pgpConfig.root + 'send-emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': w3pgpConfig.nonce // Security
-            },
-            body: JSON.stringify({
-              unames: unames,
-              downloadLink: downloadLink
-            })
-        });
-
-        const result = await response.json();
-            return result;
-
-    } catch (err) {
-        return err;
-    }
-}
-
-
-
-async function w3CheckForEncryptedLink() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const file = urlParams.get('w3download');
-    const token = urlParams.get('key');
-
-    if (file && token) {
-        console.log("Encrypted link detected. Fetching payload...");
-
-        // alert('Encrypted link detected');
-        // Trigger click to Auto Open the decrypt screen
-        document.getElementById("decryptInterface").click();
-
-        // Show a "Loading" status
-
-        const status = document.getElementById("w3_wrap_link-decrypt-form");
-        status.setAttribute("style", "display:block;");
-
-        document.getElementById('w3_wrap_link-decrypt-form').scrollIntoView({ behavior:'smooth', block:'start' });
-
-     /*setTimeout(() => {
-       document.getElementById('w3_wrap_link-decrypt-form').scrollIntoView({ behavior:'smooth', block:'start' });
-      }, 1000);*/
-
-       status.innerHTML = "?? <b>Retrieving encrypted file from vault...</b>";
-
-        try {
-            // Call get-encrypted-content endpoint
-            const response = await fetch(`${w3pgpConfig.root}get-encrypted-content?file=${file}&key=${token}`);
-
-            if (response.status == 200) {
-
-             buffer = await response.arrayBuffer();
-
-             status.setAttribute("style", "display:none;");
-             document.getElementById('w3EncryptedLoaded').setAttribute("style","display:block;");
-             document.getElementById('w3EncryptedLoaded').scrollIntoView({ behavior:'smooth', block:'start' });
-            } else {
-                status.innerHTML = "? <b>Link Expired:</b> The file is no longer available.";
-            }
-        } catch (err) {
-            console.error(err);
-            status.innerHTML = "? Failed to reach the server.";
-        }
-    }
-}
-
-
 async function w3encryptMLKEM(key, fromTypedText) {
 
     if (isDoingTask > 0) return;
@@ -2197,20 +2123,6 @@ async function w3encryptMLKEM(key, fromTypedText) {
      alert("No files selected.");
      return;
     }
-
-
-
-
-/*if (totalSize > w3pgpConfig.max_upload_size) {
-    limitDisplay.textContent = `?? Too Large: ${(totalSize/1024/1024).toFixed(1)}MB / ${w3pgpConfig.max_upload_human}`;
-    limitDisplay.style.color = "#e74c3c"; // Warning red
-    alert('The selected file(s) exceed the maximum upload limit!\n\nThe encrypted file will not be saved to the Server vault, and no emails will be sent to recipients.\n\nYou can download the file after encryption.');
-} else {
-    limitDisplay.textContent = `? Ready (${(totalSize/1024/1024).toFixed(1)}MB)`;
-    limitDisplay.style.color = "#27ae60";
-}*/
-
- //console.log("Proceeding with resulting uidsAry:", uidsAry);
 
      if(uidsAry.length > 0){
       allArmoredKeys = await get_bulk_keys(uidsAry);
