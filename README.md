@@ -43,6 +43,6 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 
 ## 🤝 Credits
 
-Powered by a compiled version of the authoritative Paul Miller **Noble** post-quantum cryptography libraries for ML-KEM and ML-DSA. 
+Powered by a compiled version of the authoritative [Noble post-quantum](https://github.com/paulmillr/noble-post-quantum) cryptography libraries for ML-KEM and ML-DSA.
 
 Developed by **axew3** — [axew3.com](https://axew3.com)
