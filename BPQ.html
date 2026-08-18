@@ -12,7 +12,7 @@ Standalone HTML file
  Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 2.1.0
+ G * - Version 2.2.0
  H * - Using the compiled Noble PQ library embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -935,7 +935,7 @@ body .w3mypgp-trigger.ready {
         letter-spacing: -0.03em;
         color:#FFFFFF;
         margin: 0;">
-        Gemini BPQ v2.1.0
+        Gemini BPQ v2.2.0
     </h1>
     <h3 style="
         font-size: clamp(1.5rem, 2.5vw, 1.7rem);
@@ -1119,7 +1119,7 @@ body .w3mypgp-trigger.ready {
 
   <div class="cCenter"><span class="cText">Load ML-DSA Private key</span><br>and sign the encrypted file<br>
     <input class="buttonC" type="file" id="senderMldsaPrivLoad" name="senderMldsaPrivLoad" accept=".txt, text/plain, image/png, image/jpeg">
-    <br><span class="mlkem-dsa-NOTloaded" id="priv-mlkem-dsa-state">Private ml-dsa sign key not loaded</span>
+    <br><span class="mlkem-dsa-NOTloaded" id="priv-dsa-state">Private ml-dsa sign key not loaded</span>
     <br><br>
   </div>
 
@@ -2004,9 +2004,9 @@ async function senderMldsaPrivLoad(){
      uPrivateKeyMldsa = privateMatches ? privateMatches[1].trim() : '';
 
       document.getElementById('senderMldsaPrivLoad').value = null;
-      // Set loaded the class of priv-mlkem-dsa-state
-      document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
-      document.getElementById("priv-mlkem-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
+      // Set loaded the class of priv-dsa-state
+      document.getElementById("priv-dsa-state").className = "mlkem-dsa-loaded";
+      document.getElementById("priv-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
     }
    } catch (err) {
         return err;
@@ -2033,7 +2033,7 @@ async function senderMldsaPubLoad(){
      uPubKeyMldsa = pubMatches ? pubMatches[1].trim() : '';
 
       document.getElementById('senderMldsaPubLoad').value = null;
-      // Set loaded the class of priv-mlkem-dsa-state
+      // Set loaded the class of priv-dsa-state
       document.getElementById("pub-mlkem-dsa-state").className = "mlkem-dsa-loaded-pub";
       document.getElementById("pub-mlkem-dsa-state").innerHTML = "<b>Public ML-DSA sign key loaded</b>";
     }
@@ -2633,25 +2633,24 @@ function overlayConvertPhraseToNumbers(phrase) {
     return { keySequence: resultNumbers, savedFinalNumber: finalNumbers };
 }
 
-function overlayGenerateFakeHex(length) {
 
-  try {
-    const arr = new Uint8Array(Math.ceil(length / 2));
+function overlayGenerateFakeHex(length = 1) {
+    const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
+    const BASE = ALPHABET.length; // 36
+    
+    const arr = new Uint8Array(length);
     crypto.getRandomValues(arr);
+    
     let result = "";
-    for (let i = 0; i < arr.length; i++) {
-     result += arr[i].toString(16).padStart(2, '0');
-    } return result.substring(0, length);
-
-  } catch (error) {
-        //console.error(error);
-        alert('⚠️ Are you sure you uploaded the correct file for this screen?\n\n'+error);
-      }
-
+    for (let i = 0; i < length; i++) {
+        let randomIndex = arr[i] % BASE;
+        result += ALPHABET.charAt(randomIndex);
+    }
+    return result;
 }
 
 
-// --- #cinciaKeys SPLIT ENGINE ---
+// --- #cinciaKeys SPLIT ENGINE (CORRECTED BASE 36) ---
 function bindOverlaySplitLogic() {
     const btn = document.getElementById('process-split-btn');
     if (!btn) return;
@@ -2682,13 +2681,10 @@ function bindOverlaySplitLogic() {
         reader.onload = function(e) {
             let rawText = e.target.result;
 
-        let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
-
-        let privateMatches = rawText.match(privateKeyRegex);
-
-        let pk = privateMatches ? privateMatches[1].trim() : '';
-
-        let hexString = pk.replace(/\s/g, '').toLowerCase();
+            let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
+            let privateMatches = rawText.match(privateKeyRegex);
+            let pk = privateMatches ? privateMatches[1].trim() : '';
+            let hexString = pk.replace(/\s/g, '').toLowerCase();
 
             if (hexString.length === 0) {
                 alert("Error: Key file payload is empty or is not a key.");
@@ -2704,20 +2700,30 @@ function bindOverlaySplitLogic() {
             const firstSeqHalf = seqArray.slice(0, seqHalfLength);
             const secondSeqHalf = seqArray.slice(seqHalfLength);
 
+            // OBFUSCATION FUNCTION CORRECTED TO BASE 36
             function obfuscateSegment(halfStr, seqHalf) {
                 let chars = halfStr.split('');
                 let currentPosition = 0;
-                const hexChars = "0123456789abcdef";
+                
+                // Extended 36-character alphabet to seamlessly blend real data with fakes
+                const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
+                const BASE = 36;
 
                 seqHalf.forEach((num) => {
                     currentPosition = (currentPosition + num) % chars.length;
                     let originalChar = chars[currentPosition];
-                    let originalValue = hexChars.indexOf(originalChar);
-                    if (originalValue === -1) return;
+                    
+                    // IMPORTANT: Read the original hex character (0-f) using base 16 parsing,
+                    // since raw input characters before obfuscation are standard hex.
+                    let originalValue = parseInt(originalChar, 16);
+                    if (isNaN(originalValue)) return;
 
-                    let obfuscatedValue = (originalValue ^ num) % 16;
-                    if (obfuscatedValue < 0) obfuscatedValue += 16;
-                    chars[currentPosition] = hexChars[obfuscatedValue];
+                    // FIX: XOR and Modulo operations applied on BASE 36 instead of 16
+                    let obfuscatedValue = (originalValue ^ num) % BASE;
+                    if (obfuscatedValue < 0) obfuscatedValue += BASE;
+                    
+                    // Store the new character using the extended alphabet range (0-x)
+                    chars[currentPosition] = ALPHABET.charAt(obfuscatedValue);
                 });
                 return chars.join('');
             }
@@ -2732,6 +2738,7 @@ function bindOverlaySplitLogic() {
                 } else if (i === secondIndex) {
                     chickadeeNest[i] = realSecondHalf;
                 } else {
+                    // Generate fakes using base 36 secure random function
                     chickadeeNest[i] = overlayGenerateFakeHex(halfLength);
                 }
             }
@@ -2745,7 +2752,9 @@ function bindOverlaySplitLogic() {
     });
 }
 
- // --- #cinciaKeys REBUILD ENGINE ---
+
+
+// --- #cinciaKeys REBUILD ENGINE (CORRECTED BASE 36) ---
  function bindOverlayRebuildLogic() {
     const btn = document.getElementById('process-rebuild-btn');
 
@@ -2790,21 +2799,29 @@ function bindOverlaySplitLogic() {
             const firstSeqHalf = seqArray.slice(0, seqHalfLength);
             const secondSeqHalf = seqArray.slice(seqHalfLength);
 
-            const hexChars = "0123456789abcdef";
-
+            // DE-OBFUSCATION FUNCTION CORRECTED TO BASE 36
             function deobfuscateSegment(halfStr, seqHalf) {
                 let chars = halfStr.split('');
                 let currentPosition = 0;
 
+                // Extended alphabet to correctly map the 36-character obfuscated fragments
+                const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
+                const BASE = 36;
+
                 seqHalf.forEach((num) => {
                     currentPosition = (currentPosition + num) % chars.length;
                     let markedChar = chars[currentPosition];
-                    let targetValue = hexChars.indexOf(markedChar);
+                    
+                    // IMPORTANT: Locate the numerical index within the extended alphabet (0-35)
+                    let targetValue = ALPHABET.indexOf(markedChar);
                     if (targetValue === -1) return;
 
-                    let originalValue = (targetValue ^ num) % 16;
-                    if (originalValue < 0) originalValue += 16;
-                    chars[currentPosition] = hexChars[originalValue];
+                    // FIX: Reverse XOR and Modulo operations executed on BASE 36 instead of 16
+                    let originalValue = (targetValue ^ num) % BASE;
+                    if (originalValue < 0) originalValue += BASE;
+                    
+                    // Reconvert the resulting numerical value (0-15) back to standard hex string (0-f)
+                    chars[currentPosition] = originalValue.toString(16);
                 });
                 return chars.join('');
             }
@@ -2820,11 +2837,10 @@ function bindOverlaySplitLogic() {
             const keySizeInBytes = cleanHex.length / 2;
 
           if (keySizeInBytes === 4896) {
-              //console.log("✅ Valid ML-DSA-87 Private Key length");
               whicKey = 1; // DSA
               uPrivateKeyMldsa = completeHexKey;
-               document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
-               document.getElementById("priv-mlkem-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
+               document.getElementById("priv-dsa-state").className = "mlkem-dsa-loaded";
+               document.getElementById("priv-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
           } else if (keySizeInBytes === 3168) {
              whicKey = 2; // KEM
              //console.log("✅ Valid ML-KEM-1024 Private Key length");
@@ -2878,8 +2894,7 @@ function bindOverlaySplitLogic() {
     });
  }
 
-
-   // Expose only the necessary. Ensures that even if another script (like a malicious browser extension) is running on the page, it cannot access variables
+   // Expose only the necessary. 
     window.w3mypgpEngine = {
         w3encryptWithtMLKEM: () => w3encryptMLKEM(mypubKey, fromTypedText),
         w3decryptWithtMLKEM: () => w3decryptMLKEM(),
@@ -3286,13 +3301,13 @@ function initOverlayNavigation() {
         color:#FFFFFF;
         margin: 0;"><a href="https://www.axew3.com/w3/bennypq/" target="_blank">HOW TO USE & DOWNLOAD</a></h2>
 
-<br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br>🔐❤️ Built for absolute Privacy – <b><a href="http://www.paypal.me/alessionanni/" target="_blank" rel="noreferrer noopener"><strong>Your privacy matters, Support the tools that protect it</strong></a></b><br><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br></div>
+<br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br>🔐❤️ Built for absolute Privacy<br><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br></div>
 
 <h2 style="text-align:center;
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">2.1.0 (C) 2026 axew3.com</h2>
+        margin:0;">2.2.0 (C) 2026 axew3.com</h2>
 
 
 <noscript>
