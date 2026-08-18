@@ -20,7 +20,7 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 ## 🚀 Key Features
 
 *   **Zero Dependencies**: A portable, standalone `BPQ.html` file running directly inside any modern web browser.
-*   **Cincia Keys Vault**: A revolutionary zero-knowledge obfuscation engine. Instead of storing private keys in plain or standard encrypted text, Cincia isolates the 2 correct key fragments out of 97 fakes, reverts modified bytes in secure memory, and automatically loads the rebuilt KEM or DSA private key right into the interface.
+*   **Cincia Keys Vault**: A zero-knowledge obfuscation engine. Instead of storing private keys in plain or standard encrypted text, Cincia isolates the 2 correct key fragments out of 97 fakes, reverts modified bytes in secure memory, and automatically loads the rebuilt KEM or DSA private key right into the interface.
 *   **Fully Auditable**: Transparent client-side execution allows immediate source code inspection before managing sensitive keys.
 *   **Cross-Compatible**: Shares a synchronized file format infrastructure with the [w3myPQ WordPress Plugin](https://wordpress.org/plugins/w3mypq/).
 
