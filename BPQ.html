@@ -2707,7 +2707,7 @@ function bindOverlaySplitLogic() {
             function obfuscateSegment(halfStr, seqHalf) {
                 let chars = halfStr.split('');
                 let currentPosition = 0;
-                const hexChars = "0123456789abcdefghilmanoprstuvzwyjkx";
+                const hexChars = "0123456789abcdef";
 
                 seqHalf.forEach((num) => {
                     currentPosition = (currentPosition + num) % chars.length;
