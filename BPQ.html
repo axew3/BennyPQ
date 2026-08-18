@@ -12,7 +12,7 @@ Standalone HTML file
  Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 2.0.0
+ G * - Version 2.1.0
  H * - Using the compiled Noble PQ library embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -539,8 +539,8 @@ display:none;
 }
 
 #process-split-btn,#process-rebuild-btn{
-	 font-size: 2.0rem;
-	 margin-bottom:15px;
+   font-size: 2.0rem;
+   margin-bottom:15px;
 }
 
 
@@ -889,50 +889,30 @@ body .w3mypgp-trigger.ready {
     // Worker listener
     self.onmessage = function(e) {
 
-    	if( e.data === 'get_PQ_keys' ){
-    		const result = getKeys();
-    		console.log('result ',result);
+      if( e.data === 'get_PQ_keys' ){
+        const result = getKeys();
+        console.log('result ',result);
         self.postMessage(result);
-    	}
+      }
 
-    	if( e.data === 'PQ_encrypt' ){
-    		const result = kemEncrypt();
-    		//console.log('result ',result);
+      if( e.data === 'PQ_encrypt' ){
+        const result = kemEncrypt();
+        //console.log('result ',result);
         //self.postMessage(result);
-    	}
+      }
 
-    	if( e.data === 'PQ_decrypt' ){
-    		const result = kemDecrypt();
-    		//console.log('result ',result);
+      if( e.data === 'PQ_decrypt' ){
+        const result = kemDecrypt();
+        //console.log('result ',result);
         //self.postMessage(result);
-    	}
-
-
+      }
 
     };
 
 
 </script>
 
-    <script>
-    const blobContent = document.getElementById('worker-library').textContent;
-    const blob = new Blob([blobContent], { type: 'text/javascript' });
-    const workerURL = window.URL.createObjectURL(blob);
 
-    // Init the worker
-    const myWorker = new Worker(workerURL);
-
-    myWorker.onmessage = function(e) {
-
-    // To actually "see" the keys as text (Hexadecimal), convert the bytes:
-    const publicKeyHex = Array.from(publicKey).map(b => b.toString(16).padStart(2, '0')).join('');
-
-     console.log("Public Key Hex:", publicKeyHex);
-    };
-
-    // Send data to the Noble library
-    myWorker.postMessage('get_dsa87_keys');
-</script>
 </head>
 
 <body>
@@ -955,7 +935,7 @@ body .w3mypgp-trigger.ready {
         letter-spacing: -0.03em;
         color:#FFFFFF;
         margin: 0;">
-        Gemini BPQ v2.0.0
+        Gemini BPQ v2.1.0
     </h1>
     <h3 style="
         font-size: clamp(1.5rem, 2.5vw, 1.7rem);
@@ -1228,7 +1208,7 @@ body .w3mypgp-trigger.ready {
 <script>
 /* (C) 2026 axew3.com - w3it.org */
 
- var myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
+ //var myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
  var isDoingTask=fromTypedText=0;
  var inactivityTimeout;
  var cinciaMode='';
@@ -1253,7 +1233,7 @@ document.getElementById('w3GenCryptoMLKEMKeys').addEventListener('click', async 
 async function w3genCryptoMLKEMKeys(profileSaveYN){
     console.log("Starting noble PQ KeyGen...");
 
-    let w = await myWorker.postMessage('get_PQ_keys');
+    //let w = await myWorker.postMessage('get_PQ_keys');
 
     myWorker.onmessage = function(e) {
 
@@ -1312,31 +1292,6 @@ async function w3genCryptoMLKEMKeys(profileSaveYN){
    document.getElementById("w3downloadPubPriv_MLDSAKeys").setAttribute("href", pubPrivDsaKey);
  };
 
-}
-
-
-async function get_bulk_keys(uidsAry) {
-
-try {
-        const response = await fetch(w3pgpConfig.root + 'get-bulk-keys', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': w3pgpConfig.nonce
-            },
-            body: JSON.stringify({ uidsAry: uidsAry })
-        });
-
-        const result = await response.json();
-        if (result) {
-            return result;
-        } else {
-            console.log("Error: " + result);
-        }
-    } catch (err) {
-
-        return err;
-    }
 }
 
 
@@ -1743,7 +1698,7 @@ async function decryptFileForMultipleMLKEM1024(arrayBuffer, alicePrivateKey, sen
                    console.log("IDENTITY VERIFIED SUCCESSFULLY!");
                 }
             } else {
-            	     console.error("Cryptographic Policy Violation: File is signed, but no valid sender verification public key was supplied.");
+                   console.error("Cryptographic Policy Violation: File is signed, but no valid sender verification public key was supplied.");
                // Block files declaring signature data if no valid verification key is supplied
                // throw new Error("Cryptographic Policy Violation: File is signed, but no valid sender verification public key was supplied.");
             }
@@ -1827,19 +1782,7 @@ async function getPrivPubKey_G() {
 
   const loadMLKEMkeysfromFile = document.querySelector('input[name="myPubPrivKeyTXT"]');
 
-document.addEventListener('change', function(event) {
 
-    if (event.target.id === 'wpw3MLKEMPrivateKeyLoad') {
-
-      (async () => {
-        let k = await getPrivPubKey_G();
-        let p = k[1];
-        myprivKey = p;
-        w3mypgpEngine.w3decryptWithtMLKEM();
-
-      })();
-    }
-});
 
 (function() {
    /* (C) 2026 axew3.com */
@@ -1848,6 +1791,7 @@ document.addEventListener('change', function(event) {
 let code = document.getElementById('worker-script').textContent;
 let encryptionWorker;
 let autoReload=0;
+let myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
 let password=uPublicKeyMlkemLoaded=uPrivateKeyMlkemLoaded=uPrivateKeyMldsa=uPubKeyMldsa='';
 let activeBlobUrls = [];
 var dec = new TextDecoder('latin1');
@@ -1884,6 +1828,18 @@ function engineWorkerRestart(){
  var encryptionWorker = new Worker(workerURL);
  return encryptionWorker;
 }
+
+
+ /*  async function decryptOnInput-KEM(){
+      (async () => {
+        let k = await getPrivPubKey_G();
+        let p = k[1];
+        myprivKey = p;
+        w3mypgpEngine.w3decryptWithtMLKEM();
+
+      })();
+
+   }*/
 
 
 async function getKeys(){
@@ -2089,6 +2045,7 @@ async function senderMldsaPubLoad(){
 
 }
 
+
 async function w3encryptMLKEM(key, fromTypedText) {
 
     if (isDoingTask > 0) return;
@@ -2121,21 +2078,12 @@ async function w3encryptMLKEM(key, fromTypedText) {
      return;
     }
 
-     if(uidsAry.length > 0){
+
+    /*if(uidsAry.length > 0){
       allArmoredKeys = await get_bulk_keys(uidsAry);
      } else {
        allArmoredKeys = [];
-      }
-
- //console.log("Proceeding with resulting allArmoredKeys:", allArmoredKeys);
-
-    /*if (allArmoredKeys.length === 0) {
-     let c = confirm('No valid recipient keys found.\n\nDo you want to encrypt the files for yourself?\n\nNote: If a public key was provided via input, it will be used. Otherwise, the key saved in your profile (if you are logged in and a key exists) will be used.\n\nAlso note that in this case, no encrypted files will be saved to the server for sharing.\n\nConfirm?');
-     if(!c){
-      document.getElementById("myFileToBeCryptedMLKEM").value = null;
-      return;
-     }
-    }*/
+      }*/
 
 
     /*
@@ -2143,9 +2091,14 @@ async function w3encryptMLKEM(key, fromTypedText) {
      -- If there is not, proceed with the one saved on profile
     */
 
-let uID =0;
+      allArmoredKeys = [];
+      let uID =0;
 
-     if (key && uID > 0 && !uidsAry.includes(uID) ) {
+       if (document.getElementById("pubKeyInfoMLKEM").textContent != '') {
+        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
+       }
+
+     /*if (key && uID > 0 && !uidsAry.includes(uID) ) {
        uidsAry.push(uID);
        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent); // Public key provided from input
        }
@@ -2154,19 +2107,16 @@ let uID =0;
        allArmoredKeys.push(w3pgpConfig.public_key_mlkem); // MLKEM Public key saved on profile
        }
        else if (document.getElementById("pubKeyInfoMLKEM").textContent != '' && uID == 0) {
-        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
+        //allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
        }
        else if (document.getElementById("pubKeyInfoMLKEM").textContent != '' && uID > 0) {
-        allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
+        //allArmoredKeys.push(document.getElementById("pubKeyInfoMLKEM").textContent);
        }
        else {
         document.getElementById("myFileToBeCryptedMLKEM").value=null;
         alert("Public key missing: Please ensure a key is saved to your profile or manually entered for encryption.");
         return;
-       }
-
-  // console.log('uPublicKeyMlkem',uPublicKeyMlkem);
-  // console.log('allArmoredKeys',allArmoredKeys);
+       }*/
 
     let totalBytes = 0;
     for (let i = 0; i < files.length; i++) { totalBytes += files[i].size; }
@@ -2550,8 +2500,8 @@ function globalReset() {
 
     // Wipe the Keys and Engine and more
 
-    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
-    uPrivateKeyMldsa,uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
+    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
+    uPrivateKeyMldsa,allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
 
     if (encryptionWorker) encryptionWorker.terminate();
 
@@ -2695,7 +2645,7 @@ function overlayGenerateFakeHex(length) {
 
   } catch (error) {
         //console.error(error);
-        alert('⚠️ Are you sure you uploaded the correct file for this screen?\n\n'+error);
+        alert('⚠️ Are you sure you uploaded the correct file for this screen? (single ML-KEM 1024 private key)\n\n'+error);
       }
 
 }
@@ -2731,7 +2681,7 @@ function bindOverlaySplitLogic() {
 
         reader.onload = function(e) {
             let rawText = e.target.result;
-            
+
         let privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
 
         let privateMatches = rawText.match(privateKeyRegex);
@@ -2876,7 +2826,7 @@ function bindOverlaySplitLogic() {
                document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
                document.getElementById("priv-mlkem-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
           } else if (keySizeInBytes === 3168) {
-          	 whicKey = 2; // KEM
+             whicKey = 2; // KEM
              //console.log("✅ Valid ML-KEM-1024 Private Key length");
              // Assign to uPrivateKeyMlkemLoaded and myprivKey the rebuilt key value
              uPrivateKeyMlkemLoaded = myprivKey = completeHexKey;
@@ -2888,17 +2838,17 @@ function bindOverlaySplitLogic() {
                console.log("❌ Unknown key length or format error.");
                return;
              }
-             
+
             let pemFormattedKey = "-----BEGIN PRIVATE KEY-----\n" + completeHexKey + "\n-----END PRIVATE KEY-----";
 
 
             if(whicKey > 1){
              keyIS = "<h2>ML-KEM Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
             } else {
-            	keyIS = "<h2>ML-DSA Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
+              keyIS = "<h2>ML-DSA Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
             }
-            
-            
+
+
             workspaceArea.innerHTML = keyIS +
                 "<p style='color:#94a3b8; font-size:0.95rem; text-align:center;'>Your key has been fully reconstructed with standard boundaries.</p>" +
                 "<div style='display:flex; flex-direction:column; gap:8px; width:100%;'>" +
@@ -2921,7 +2871,7 @@ function bindOverlaySplitLogic() {
                 downloadLink.download = "recovered_private_key.txt";
                 downloadLink.click();
             });
-            
+
             completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '00000000000000000000000';
             completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '';
         };
@@ -3342,7 +3292,7 @@ function initOverlayNavigation() {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">2.0.0 (C) 2026 axew3.com</h2>
+        margin:0;">2.1.0 (C) 2026 axew3.com</h2>
 
 
 <noscript>
