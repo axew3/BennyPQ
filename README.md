@@ -38,7 +38,7 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 
 ## 📝 Project Status & Development Note
 
-*BennyPQ is essentially an optimized standalone excerpt of the **w3myPQ** core engine. The standalone code is currently undergoing active refactoring to strip away unused WordPress backend structures and minimize file overhead. Feel free to inspect, contribute, or report issues!*
+*BennyPQ is essentially an optimized standalone excerpt of the **w3myPQ** core engine. Feel free to inspect, contribute, or report issues!*
 
 ---
 
