@@ -38,7 +38,7 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 
 ## 📝 Project Status & Development Note
 
-*BennyPQ is essentially an optimized standalone excerpt of the **[w3myPQ WordPress Plugin](https://wordpress.org/plugins/w3mypq/).** core engine. Feel free to inspect, contribute, or report issues!*
+*BennyPQ is essentially an optimized standalone excerpt of the **[w3myPQ WordPress Plugin](https://wordpress.org/plugins/w3mypq/)** core engine. Feel free to inspect, contribute, or report issues!*
 
 ---
 
