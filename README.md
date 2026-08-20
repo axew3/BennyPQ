@@ -51,3 +51,5 @@ Developed by **axew3** — [axew3.com](https://axew3.com)
 MIT License
 
 Copyright (c) 2026 axew3
+
+🔐❤️ Built for absolute Privacy – [Your privacy matters: Support the tools that protect it.](http://www.paypal.me/alessionanni/)
