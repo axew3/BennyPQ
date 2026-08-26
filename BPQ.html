@@ -6,13 +6,13 @@
 BennyPQ encryption tool
 Standalone HTML file
 
-(C) since 2026 axew3.com
+(C) copyright 2026 axew3.com
  O * - Generate PQ crypto key pairs and safely hide Private Keys.
  P * - ML-KEM 1024 for secure key exchange and ML-DSA 87 for sender identity verification.
  Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 2.2.0
+ G * - Version 3.0.0
  H * - Using the compiled Noble PQ library embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -930,12 +930,12 @@ body .w3mypgp-trigger.ready {
     flex-direction: column;
 ">
     <h1 style="
-        font-size: clamp(2.0rem, 5vw, 3.5rem);
+        font-size: 4.0rem;
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#FFFFFF;
         margin: 0;">
-        Gemini BPQ v2.2.0
+        Gemini BPQ
     </h1>
     <h3 style="
         font-size: clamp(1.5rem, 2.5vw, 1.7rem);
@@ -945,7 +945,7 @@ body .w3mypgp-trigger.ready {
         margin: 0;">Standalone HTML/JS Encryption & Decryption</h3>
 </header>
 
-<!-- (C) 2026 axew3.com -->
+<!-- (C) axew3.com -->
 <div id="wrapw3mypgp">
   <div class="wrapw3mypgp">
 
@@ -1211,7 +1211,7 @@ body .w3mypgp-trigger.ready {
  //var myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
  var isDoingTask=fromTypedText=0;
  var inactivityTimeout;
- var cinciaMode='';
+ var cinciaMode=mypubKey='';
 
 //const INACTIVITY_LIMIT = 3 * 60 * 1000;// 3 min
 const INACTIVITY_LIMIT = 5 * 60 * 1000;// 5 min
@@ -1794,7 +1794,7 @@ let autoReload=0;
 let myPubPrivKey=ciphertext=myprivKey=mypubKey=passw=ciphertextChunks='';
 let password=uPublicKeyMlkemLoaded=uPrivateKeyMlkemLoaded=uPrivateKeyMldsa=uPubKeyMldsa='';
 let activeBlobUrls = [];
-var dec = new TextDecoder('latin1');
+var dec = new TextDecoder();
 var enc = new TextEncoder();
 let requestedEncrypted;
 let buffer,allArmoredKeys;
@@ -1828,19 +1828,6 @@ function engineWorkerRestart(){
  var encryptionWorker = new Worker(workerURL);
  return encryptionWorker;
 }
-
-
- /*  async function decryptOnInput-KEM(){
-      (async () => {
-        let k = await getPrivPubKey_G();
-        let p = k[1];
-        myprivKey = p;
-        w3mypgpEngine.w3decryptWithtMLKEM();
-
-      })();
-
-   }*/
-
 
 async function getKeys(){
 
@@ -2500,8 +2487,8 @@ function globalReset() {
 
     // Wipe the Keys and Engine and more
 
-    uPrivateKeyMldsa,pemFormattedKey,mypubKey=myPrivKey=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
-    uPrivateKeyMldsa,allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
+    uPrivateKeyMldsa=pemFormattedKey=mypubKey=myPrivKey=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded="0000000000000000000000000000";
+    mypubKey=myPrivKey=pemFormattedKey=uPrivateKeyMldsa=allArmoredKeys=uPrivateKeyMlkemLoaded=uPublicKeyMlkemLoaded=null;
 
     if (encryptionWorker) encryptionWorker.terminate();
 
@@ -2585,8 +2572,8 @@ let overlayRebuildViewHTML = `
 return overlayRebuildViewHTML;
 }
 
-// --- Copyright axe3.com
-// --- CinciaKeys MATH
+// --- (C) copyright 2026 axew3.com
+// --- CinciaKeys MATH (C)
 function overlayConvertPhraseToNumbers(phrase) {
     const trailingNumbersMatch = phrase.match(/\s+(\d+)$/);
     let finalNumbers = "";
@@ -2633,14 +2620,13 @@ function overlayConvertPhraseToNumbers(phrase) {
     return { keySequence: resultNumbers, savedFinalNumber: finalNumbers };
 }
 
-
 function overlayGenerateFakeHex(length = 1) {
     const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
     const BASE = ALPHABET.length; // 36
-    
+
     const arr = new Uint8Array(length);
     crypto.getRandomValues(arr);
-    
+
     let result = "";
     for (let i = 0; i < length; i++) {
         let randomIndex = arr[i] % BASE;
@@ -2650,7 +2636,7 @@ function overlayGenerateFakeHex(length = 1) {
 }
 
 
-// --- #cinciaKeys SPLIT ENGINE (CORRECTED BASE 36) ---
+// --- #cinciaKeys SPLIT ENGINE (BASE 36) ---
 function bindOverlaySplitLogic() {
     const btn = document.getElementById('process-split-btn');
     if (!btn) return;
@@ -2704,7 +2690,7 @@ function bindOverlaySplitLogic() {
             function obfuscateSegment(halfStr, seqHalf) {
                 let chars = halfStr.split('');
                 let currentPosition = 0;
-                
+
                 // Extended 36-character alphabet to seamlessly blend real data with fakes
                 const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
                 const BASE = 36;
@@ -2712,7 +2698,7 @@ function bindOverlaySplitLogic() {
                 seqHalf.forEach((num) => {
                     currentPosition = (currentPosition + num) % chars.length;
                     let originalChar = chars[currentPosition];
-                    
+
                     // IMPORTANT: Read the original hex character (0-f) using base 16 parsing,
                     // since raw input characters before obfuscation are standard hex.
                     let originalValue = parseInt(originalChar, 16);
@@ -2721,7 +2707,7 @@ function bindOverlaySplitLogic() {
                     // FIX: XOR and Modulo operations applied on BASE 36 instead of 16
                     let obfuscatedValue = (originalValue ^ num) % BASE;
                     if (obfuscatedValue < 0) obfuscatedValue += BASE;
-                    
+
                     // Store the new character using the extended alphabet range (0-x)
                     chars[currentPosition] = ALPHABET.charAt(obfuscatedValue);
                 });
@@ -2754,13 +2740,139 @@ function bindOverlaySplitLogic() {
 
 
 
-// --- #cinciaKeys REBUILD ENGINE (CORRECTED BASE 36) ---
- function bindOverlayRebuildLogic() {
-    const btn = document.getElementById('process-rebuild-btn');
+// --- UTILITY: Derive Deterministic Keys & Indices from a Phrase ---
+async function overlayDeriveKeyAndIndices(phrase) {
+    // Enforce length constraints on the phrase safely
+    const cleanPhrase = phrase.replace(/[^a-zA-Z]/g, '');
+    if (cleanPhrase.length < 10 || cleanPhrase.length > 100) {
+        alert("Invalid phrase! The text must contain between 10 and 100 letters.");
+        return null;
+    }
 
+    const encoder = new TextEncoder();
+    const phraseBytes = encoder.encode(phrase);
+
+    // Use a fixed salt to make the generation deterministic based on the phrase
+    const fixedSalt = encoder.encode("cinciaKeys_salt_fixed_constant");
+
+    // Import raw phrase as a key material
+    const baseKey = await crypto.subtle.importKey(
+        "raw", phraseBytes, "PBKDF2", false, ["deriveBits", "deriveKey"]
+    );
+
+    // Derive a master seed using PBKDF2 with high iterations to resist brute-forcing
+    const derivedBits = await crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: fixedSalt,
+            iterations: 700000,
+            hash: "SHA-256"
+        },
+        baseKey,
+        256 // 32 bytes
+    );
+
+    // Use the derived master seed bytes to determine the two unique array indices (0-96)
+    const view = new DataView(derivedBits);
+    let firstIndex = view.getUint16(0) % 97;
+    let secondIndex = view.getUint16(2) % 97;
+    if (firstIndex === secondIndex) {
+        secondIndex = (secondIndex + 1) % 97;
+    }
+
+    // Import the remaining derived bits as a true AES encryption key
+    const aesKey = await crypto.subtle.importKey(
+        "raw", derivedBits, "AES-GCM", false, ["encrypt", "decrypt"]
+    );
+
+    return { aesKey, firstIndex, secondIndex };
+}
+
+// --- Generate Cryptographically Secure Noise ---
+function overlayGenerateSecureNoise(byteLength) {
+    const arr = new Uint8Array(byteLength);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// --- SPLIT AND OBFUSCATE ENGINE ---
+function bindOverlaySplitLogic() {
+    const btn = document.getElementById('process-split-btn');
     if (!btn) return;
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
+        const fileInput = document.getElementById('key-file');
+        const phraseInput = document.getElementById('secret-phrase').value;
+
+        if (!fileInput.files || fileInput.files.length === 0 || !phraseInput.trim()) {
+            alert("Please select your key file and enter a phrase.");
+            return;
+        }
+
+        const cryptoContext = await overlayDeriveKeyAndIndices(phraseInput);
+        if (!cryptoContext) return;
+        const { aesKey, firstIndex, secondIndex } = cryptoContext;
+
+        const reader = new FileReader();
+        reader.readAsText(fileInput.files[0]);
+
+        reader.onload = async function(e) {
+            const rawText = e.target.result;
+            const privateKeyRegex = /-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/;
+            const privateMatches = rawText.match(privateKeyRegex);
+            const pk = privateMatches ? privateMatches[1].trim() : '';
+            const cleanKeyString = pk.replace(/\s/g, '');
+
+            if (cleanKeyString.length === 0) {
+                alert("Error: Key file payload is empty or format is invalid.");
+                return;
+            }
+
+            // Split the string key into clean halves
+            const halfLength = Math.floor(cleanKeyString.length / 2);
+            const encoder = new TextEncoder();
+            const firstHalfBytes = encoder.encode(cleanKeyString.substring(0, halfLength));
+            const secondHalfBytes = encoder.encode(cleanKeyString.substring(halfLength));
+
+            // Use fixed initialization vectors (IVs) derived safely for deterministic encryption
+            const iv1 = new Uint8Array(12).fill(1);
+            const iv2 = new Uint8Array(12).fill(2);
+
+            const encFirstHalf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv1 }, aesKey, firstHalfBytes);
+            const encSecondHalf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv2 }, aesKey, secondHalfBytes);
+
+            const hexFirstHalf = Array.from(new Uint8Array(encFirstHalf)).map(b => b.toString(16).padStart(2, '0')).join('');
+            const hexSecondHalf = Array.from(new Uint8Array(encSecondHalf)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            // Fill a 97-slot array with indistinguishable secure noise or your real data
+            const chickadeeNest = new Array(97);
+            const typicalOutputByteLength = encFirstHalf.byteLength;
+
+            for (let i = 0; i < 97; i++) {
+                if (i === firstIndex) {
+                    chickadeeNest[i] = hexFirstHalf;
+                } else if (i === secondIndex) {
+                    chickadeeNest[i] = hexSecondHalf;
+                } else {
+                    chickadeeNest[i] = overlayGenerateSecureNoise(typicalOutputByteLength);
+                }
+            }
+
+            const outputBlob = new Blob([chickadeeNest.join('\n')], { type: 'text/plain' });
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(outputBlob);
+            downloadLink.download = "BPQ_PrivateKey_nest.txt";
+            downloadLink.click();
+        };
+    });
+}
+
+// --- REBUILD AND DECRYPTION ENGINE ---
+function bindOverlayRebuildLogic() {
+    const btn = document.getElementById('process-rebuild-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
         const fileInput = document.getElementById('nest-file');
         const phraseInput = document.getElementById('rebuild-phrase').value;
         const workspaceArea = document.getElementById('overlay-dynamic-content');
@@ -2770,129 +2882,94 @@ function bindOverlaySplitLogic() {
             return;
         }
 
-        const conversionResult = overlayConvertPhraseToNumbers(phraseInput);
-        if (conversionResult === null) return;
-
-        const fullNumberString = conversionResult.savedFinalNumber;
-        let firstIndex = parseInt(fullNumberString.substring(0, 2), 10) % 97;
-        let secondIndex = parseInt(fullNumberString.substring(2, 4), 10) % 97;
-
-        if (firstIndex === secondIndex) {
-            secondIndex = (secondIndex + 1) % 97;
-        }
+        const cryptoContext = await overlayDeriveKeyAndIndices(phraseInput);
+        if (!cryptoContext) return;
+        const { aesKey, firstIndex, secondIndex } = cryptoContext;
 
         const reader = new FileReader();
         reader.readAsText(fileInput.files[0]);
 
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const lines = e.target.result.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             if (lines.length < 97) {
                 alert("Invalid Nest file! It does not contain 97 segments.");
                 return;
             }
 
-            let scrambledFirstHalf = lines[firstIndex];
-            let scrambledSecondHalf = lines[secondIndex];
+            // Helper to turn hex text strings back into raw byte arrays
+            const hexToBytes = hexStr => new Uint8Array(hexStr.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 
-            const seqArray = conversionResult.keySequence;
-            const seqHalfLength = Math.ceil(seqArray.length / 2);
-            const firstSeqHalf = seqArray.slice(0, seqHalfLength);
-            const secondSeqHalf = seqArray.slice(seqHalfLength);
+            try {
+                const encFirstHalfBytes = hexToBytes(lines[firstIndex]);
+                const encSecondHalfBytes = hexToBytes(lines[secondIndex]);
 
-            // DE-OBFUSCATION FUNCTION CORRECTED TO BASE 36
-            function deobfuscateSegment(halfStr, seqHalf) {
-                let chars = halfStr.split('');
-                let currentPosition = 0;
+                const iv1 = new Uint8Array(12).fill(1);
+                const iv2 = new Uint8Array(12).fill(2);
 
-                // Extended alphabet to correctly map the 36-character obfuscated fragments
-                const ALPHABET = "0123456789abcdefghijklmnopqrstuvwx";
-                const BASE = 36;
+                const dec1 = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv1 }, aesKey, encFirstHalfBytes);
+                const dec2 = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv2 }, aesKey, encSecondHalfBytes);
 
-                seqHalf.forEach((num) => {
-                    currentPosition = (currentPosition + num) % chars.length;
-                    let markedChar = chars[currentPosition];
-                    
-                    // IMPORTANT: Locate the numerical index within the extended alphabet (0-35)
-                    let targetValue = ALPHABET.indexOf(markedChar);
-                    if (targetValue === -1) return;
+                const decoder = new TextDecoder();
+                const completeKeyString = decoder.decode(dec1) + decoder.decode(dec2);
 
-                    // FIX: Reverse XOR and Modulo operations executed on BASE 36 instead of 16
-                    let originalValue = (targetValue ^ num) % BASE;
-                    if (originalValue < 0) originalValue += BASE;
-                    
-                    // Reconvert the resulting numerical value (0-15) back to standard hex string (0-f)
-                    chars[currentPosition] = originalValue.toString(16);
-                });
-                return chars.join('');
-            }
+                // Detect layout metrics based on standard key length string parameters
+                let whicKey = 0;
+                let keyIS = '';
+                const cleanHex = completeKeyString.replace(/^0x/i, '').replace(/[\s:]/g, '');
+                const keySizeInBytes = cleanHex.length / 2;
 
-            let recoveredFirstHalf = deobfuscateSegment(scrambledFirstHalf, firstSeqHalf);
-            let recoveredSecondHalf = deobfuscateSegment(scrambledSecondHalf, secondSeqHalf);
-            let completeHexKey = recoveredFirstHalf + recoveredSecondHalf;
+                if (keySizeInBytes === 4896) {
+                    whicKey = 1; // ML-DSA-87
+                    uPrivateKeyMldsa = completeKeyString;
+                    document.getElementById("priv-mlkem-dsa-state").className = "mlkem-dsa-loaded";
+                    document.getElementById("priv-mlkem-dsa-state").textContent = "Private ML-DSA sign key loaded";
+                } else if (keySizeInBytes === 3168) {
+                    whicKey = 2; // ML-KEM-1024
+                    uPrivateKeyMlkemLoaded = myprivKey = completeKeyString;
+                    document.getElementById("privKeyState").textContent = 'Private key loaded';
+                    document.getElementById("privKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
+                    document.getElementById("privKeyInfoMLKEM").textContent = 'Private key loaded but not displayed';
+                } else {
+                    alert("System Exception: Reconstructed key size signature does not match expectations.");
+                    return;
+                }
 
-            // Detect which key has been rebuilt based on key length
-            let whicKey = 0;
-            let keyIS = '';
-            const cleanHex = completeHexKey.replace(/^0x/i, '').replace(/[\s:]/g, '');
-            const keySizeInBytes = cleanHex.length / 2;
+                pemFormattedKey = "-----BEGIN PRIVATE KEY-----\n" + completeKeyString + "\n-----END PRIVATE KEY-----";
+                keyIS = whicKey > 1 ? "<h2>ML-KEM Private Key Rebuilt! 🧩</h2>" : "<h2>ML-DSA Private Key Rebuilt! 🧩</h2>";
 
-          if (keySizeInBytes === 4896) {
-              whicKey = 1; // DSA
-              uPrivateKeyMldsa = completeHexKey;
-               document.getElementById("priv-dsa-state").className = "mlkem-dsa-loaded";
-               document.getElementById("priv-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
-          } else if (keySizeInBytes === 3168) {
-             whicKey = 2; // KEM
-             //console.log("✅ Valid ML-KEM-1024 Private Key length");
-             // Assign to uPrivateKeyMlkemLoaded and myprivKey the rebuilt key value
-             uPrivateKeyMlkemLoaded = myprivKey = completeHexKey;
-              document.getElementById("privKeyState").textContent='Private key loaded';
-              document.getElementById("privKeyState").setAttribute("style", "border:5px dashed #4BEA43;");
-              document.getElementById("privKeyInfoMLKEM").textContent='Private key loaded but not displayed';
+                // Secure dynamic UI updates using textContent to stop XSS vulnerabilities
+                workspaceArea.innerHTML = keyIS +
+                    "<p style='color:#94a3b8; font-size:0.95rem; text-align:center;'>Your key has been fully reconstructed with standard boundaries.</p>" +
+                    "<div style='display:flex; flex-direction:column; gap:8px; width:100%;'>" +
+                        "<textarea id='overlay-copy-key-box' style='width:100%; height:140px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:8px; padding:12px; font-family:monospace; resize:none;' readonly></textarea>" +
+                    "</div>" +
+                    "<button id='overlay-copy-btn' style='background:#334155; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:5px;'>Copy to Clipboard</button>" +
+                    "<button id='overlay-download-key-btn' style='background:#0ea5e9; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:10px;'>Download .txt Key File</button>";
 
-            } else {
-               console.log("❌ Unknown key length or format error.");
-               return;
-             }
+                    document.getElementById('overlay-copy-key-box').textContent = pemFormattedKey;
 
-            let pemFormattedKey = "-----BEGIN PRIVATE KEY-----\n" + completeHexKey + "\n-----END PRIVATE KEY-----";
+                    document.getElementById('overlay-copy-btn').addEventListener('click', () => {
 
+                      let textarea = document.getElementById('overlay-copy-key-box');
+                      textarea.select();navigator.clipboard.writeText(textarea.value);
+                      alert("Copied to clipboard!");});
 
-            if(whicKey > 1){
-             keyIS = "<h2>ML-KEM Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
-            } else {
-              keyIS = "<h2>ML-DSA Private Key Rebuilt And Loaded Successfully! 🧩</h2>"
-            }
+                      document.getElementById('overlay-download-key-btn').addEventListener('click', () => {
+                        let outputBlob = new Blob([pemFormattedKey], { type: 'text/plain' });
+                        let downloadLink = document.createElement('a');
+                        downloadLink.href = URL.createObjectURL(outputBlob);
+                        downloadLink.download = "recovered_private_key.txt";
+                        downloadLink.click();
+                      });
 
-
-            workspaceArea.innerHTML = keyIS +
-                "<p style='color:#94a3b8; font-size:0.95rem; text-align:center;'>Your key has been fully reconstructed with standard boundaries.</p>" +
-                "<div style='display:flex; flex-direction:column; gap:8px; width:100%;'>" +
-                    "<textarea id='overlay-copy-key-box' style='width:100%; height:140px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:8px; padding:12px; font-family:monospace; resize:none;' readonly>" + pemFormattedKey + "</textarea>" +
-                "</div>" +
-                "<button id='overlay-copy-btn' style='background:#334155; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:5px;'>Copy to Clipboard</button>" +
-                "<button id='overlay-download-key-btn' style='background:#0ea5e9; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:10px;'>Download .txt Key File</button>";
-
-            document.getElementById('overlay-copy-btn').addEventListener('click', () => {
-                let textarea = document.getElementById('overlay-copy-key-box');
-                textarea.select();
-                navigator.clipboard.writeText(textarea.value);
-                alert("Copied to clipboard!");
-            });
-
-            document.getElementById('overlay-download-key-btn').addEventListener('click', () => {
-                let outputBlob = new Blob([pemFormattedKey], { type: 'text/plain' });
-                let downloadLink = document.createElement('a');
-                downloadLink.href = URL.createObjectURL(outputBlob);
-                downloadLink.download = "recovered_private_key.txt";
-                downloadLink.click();
-            });
-
-            completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '00000000000000000000000';
-            completeHexKey = recoveredFirstHalf = recoveredSecondHalf = '';
+                    } catch (err) {
+                        alert("Decryption failed! The recovery phrase is wrong or the file data is modified.");
+                      }
         };
-    });
- }
+      })
+;} // --- CinciaKeys MATH END
+
+
 
    // Expose only the necessary. 
     window.w3mypgpEngine = {
@@ -2930,10 +3007,6 @@ document.getElementById("destroySessionHybrid").addEventListener("click", functi
   w3mypgpEngine.globalReset();
 });
 
-
-const fileInputPubK = document.querySelector('input[name="myPublicKeyTXT"]');
-const fileInputPrivK = document.querySelector('input[name="myPrivateKeyTXT"]');
-const fileInputToDecrypt = document.querySelector('input[name="mlkemCryptedFile"]');
 
 const content = document.querySelector(".content");
 
@@ -3301,13 +3374,15 @@ function initOverlayNavigation() {
         color:#FFFFFF;
         margin: 0;"><a href="https://www.axew3.com/w3/bennypq/" target="_blank">HOW TO USE & DOWNLOAD</a></h2>
 
-<br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br>🔐❤️ Built for absolute Privacy<br><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br></div>
+<br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br>🔐❤️ Built for absolute Privacy<br><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br>
+<br>🔐❤️ Built for absolute Privacy – <b><a href="http://www.paypal.me/alessionanni/" target="_blank" rel="noreferrer noopener"><strong>Your privacy matters: Support the tools that protect it.</strong></a></b><br></div>
+
 
 <h2 style="text-align:center;
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">2.2.0 (C) 2026 axew3.com</h2>
+        margin:0;">3.0.0 (C) 2026 axew3.com</h2>
 
 
 <noscript>
