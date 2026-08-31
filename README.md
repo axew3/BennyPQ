@@ -3,6 +3,7 @@
 **BennyPQ** is an ultra-lightweight, single-file HTML standalone tool designed to generate Post-Quantum Cryptography (PQC) key pairs, perform local file/s encryption/decryption, and safely obfuscate Private Keys using the **Cincia Keys Vault** mechanism.
 
 Completely client-side and auditable, BennyPQ guarantees absolute data sovereignty by design—zero dependencies, zero tracking, and zero server interaction required for core cryptographic tasks. [How to](https://www.axew3.com/w3/bennypq/)
+[Online example BPQ (BennyPQ)]([https://www.axew3.com/w3/bennypq/](https://www.axew3.com/www/deApps/BPQ/BennyPQ.html))
 
 ---
 
