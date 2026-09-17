@@ -49,7 +49,7 @@ Operating on a strict **Zero-Trust model**, encryption occurs entirely client-si
 
 ## 🛡️ Prevention of Public Key Injection & Impersonation
 
-To eliminate risks from compromised servers, users can leverage the **BennyPQ** standalone client integration **[BPQ](https://axew3.com)**, ensuring encryption routines remain secure in a local browser sandbox.
+To eliminate risks from compromised servers, users can leverage the **BennyPQ** standalone client integration **[BPQ](https://www.axew3.com/w3/bennypq/)**, ensuring encryption routines remain secure in a local browser sandbox.
 
 ---
 
