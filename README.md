@@ -39,6 +39,20 @@ BennyPQ implements state-of-the-art, future-proof protocols aligned with recent 
 
 ---
 
+## 🌐 Decentralized Architecture
+
+The **w3myPQ** ecosystem is fully decentralized, binding identity cryptographically to post-quantum keypairs rather than a centralized database. Users can share payloads across separate WordPress sites using the same keys, enabling seamless multi-node cryptographic federation.
+
+## 🔒 Zero-Trust & Anonymity Pipeline
+
+Operating on a strict **Zero-Trust model**, encryption occurs entirely client-side. Servers merely handle transport and remain completely blind to the protected payload data.
+
+## 🛡️ Prevention of Public Key Injection & Impersonation
+
+To eliminate risks from compromised servers, users can leverage the **BennyPQ** standalone client integration **[BPQ](https://axew3.com)**, ensuring encryption routines remain secure in a local browser sandbox.
+
+---
+
 ## 📝 Project Status & Development Note
 
 *BennyPQ is essentially an optimized standalone excerpt of the **[w3myPQ WordPress Plugin](https://wordpress.org/plugins/w3mypq/)** core engine. Feel free to inspect, contribute, or report issues!*
