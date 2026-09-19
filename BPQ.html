@@ -13,7 +13,7 @@ w3myPQ Standalone Client Integration
  Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.0
+ G * - Version 3.2.1
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -82,10 +82,21 @@ a:focus, a:hover, a:active {
 }
 
 .mlkem-dsa-NOTloaded{
-
 }
 .mlkem-dsa-loaded,.mlkem-dsa-loaded-pub{
   color:#4BEA43;
+}
+
+input::placeholder {
+  font-size: 1.3rem; /* Makes the placeholder text bigger */
+  font-weight: 500;   /* Optional: makes it slightly bolder */
+  color: #a0aec0;     /* Optional: standard placeholder gray color */
+}
+
+/* Ensure the main input text is also large enough to match */
+input {
+  font-size: 1.3rem;
+  padding: 12px 16px; /* Adds extra padding so the large text fits nicely */
 }
 
 .copyleft{
@@ -677,7 +688,6 @@ text-align:center;
    padding: 0 20px;
    text-align:center;
 }
-
 .w3Bold{
  text-align:center;
  font-weight:900;
@@ -685,6 +695,7 @@ text-align:center;
 .w3blank{
   color:#FFFFFF;
 }
+.highL{ color: #00d2ff; }
 
 
 /*Preloader*/
@@ -1032,14 +1043,14 @@ body .w3mypgp-trigger.ready {
         letter-spacing: -0.03em;
         color:#FFFFFF;
         margin: 0;">
-        Gemini BPQ
+        w3my BPQ
     </h1>
     <h3 style="
         font-size: clamp(1.5rem, 2.5vw, 1.7rem);
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#FFFFFF;
-        margin: 0;">Standalone HTML/JS Encryption & Decryption</h3>
+        margin: 0;">File Encryption/Decryption <span style="font-size:50%">and Decentralized Sharing Engine</span></h3>
 </header>
 
 <!-- (C) axew3.com -->
@@ -1285,7 +1296,7 @@ body .w3mypgp-trigger.ready {
         <!-- Close Button Component -->
         <button id="btnCloseW3HostPanel" class="w3host-close-x">&times;</button>
 
-        <h2>w3mypq Gateway</h2>
+        <h2>w3myPQ Gateway</h2>
 
         <!-- Form Elements Frame -->
         <div class="w3host-form-group">
@@ -1294,12 +1305,12 @@ body .w3mypgp-trigger.ready {
             <input type="url" id="w3RestHostUrl" placeholder="https://your-wordpress-site.com" autocomplete="off">
 
 
-            <label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Your WordPress Username / Email</label>
+            <label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Your WordPress Username or Email</label>
             <input type="text" id="w3RestSenderUsername" placeholder="your_wp_username" autocomplete="off" style="width: 100%; font-size: 16px; padding: 10px; background-color: transparent; border: 3px solid #3B4568; border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
 
             <!-- ML-DSA Private Key Input for Challenge Handshake Signing -->
             <div><label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Load ML-DSA Private Key</label></div>
-            <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:70%">Note: Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload.</label></div>
+            <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note:</span> Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload.</label></div>
             <input type="file" id="w3RestMldsaPriv" accept=".txt, text/plain">
 
             <!-- Ciphered Data Payload File Selector -->
@@ -4130,14 +4141,14 @@ document.addEventListener("DOMContentLoaded", () => {
         margin: 0;"><a href="https://www.axew3.com/w3/bennypq/" target="_blank">HOW TO USE & DOWNLOAD</a></h2>
 
 <br><b>The BennyPQ tool and the w3myPQ plugin use a cross-compatible file format</b><br><a target="_blank" href="https://wordpress.org/plugins/w3mypq/" rel="nofollow">WordPress w3myPQ encryption tool</a><br><a target="_blank" href="https://www.axew3.com/">axew3.com</a><br>
-<br>🔐❤️ Built for absolute Privacy – <b><a href="http://www.paypal.me/alessionanni/" target="_blank" rel="noreferrer noopener"><strong>Your privacy matters: Support the tools that protect it.</strong></a></b><br></div>
+<br>🔐❤️ Built for absolute Privacy – <b><a href="http://www.paypal.me/alessionanni/" target="_blank" rel="noreferrer noopener"><strong>Your privacy matters: Thanks for your support</strong></a></b><br></div>
 
 
 <h2 style="text-align:center;
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.0 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.1 (C) 2026 axew3.com</h2>
 
 
 <noscript>
