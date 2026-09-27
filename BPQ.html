@@ -10,10 +10,10 @@ w3myPQ Standalone Client Integration
  Copyright (C) 2026 axew3.com
  O * - Generate PQ crypto key pairs and safely hide Private Keys.
  P * - ML-KEM 1024 for secure key exchange and ML-DSA 87 for sender identity verification.
- Y * - Military-Grade Encryption: AES-GCM-256 and SHA-512 (for Hashing/Integrity).
+ Y * - Military-Grade Encryption: AES-GCM-256 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.1
+ G * - Version 3.2.2
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -1287,7 +1287,7 @@ body .w3mypgp-trigger.ready {
 
 <!-- Trigger Button for the Host Configuration -->
 <div class="cCenter" style="margin-top: 20px;">
-    <button id="btnOpenW3HostPanel" class="buttonC">📤 Remote Hosting Panel</button>
+    <button id="btnOpenW3HostPanel" class="buttonC">📤 Remote Hosting Share Panel</button>
 </div>
 
 <!-- The Left-to-Right Sliding Overlay Panel -->
@@ -1301,16 +1301,18 @@ body .w3mypgp-trigger.ready {
         <!-- Form Elements Frame -->
         <div class="w3host-form-group">
             <!-- Target URL Input -->
-            <label class="cText" style="display: block; margin-bottom: 5px;">WordPress Host URL</label>
+            <label class="cText" style="display: block; margin-bottom: 5px;">WordPress Site Host URL</label>
+            <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note</span> It must be the absolute main WordPress URL:</label></div>
+
             <input type="url" id="w3RestHostUrl" placeholder="https://your-wordpress-site.com" autocomplete="off">
 
 
-            <label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Your WordPress Username or Email</label>
+            <label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Username or Email</label>
             <input type="text" id="w3RestSenderUsername" placeholder="your_wp_username" autocomplete="off" style="width: 100%; font-size: 16px; padding: 10px; background-color: transparent; border: 3px solid #3B4568; border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
 
             <!-- ML-DSA Private Key Input for Challenge Handshake Signing -->
             <div><label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Load ML-DSA Private Key</label></div>
-            <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note:</span> Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload.</label></div>
+            <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note</span> Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload:</label></div>
             <input type="file" id="w3RestMldsaPriv" accept=".txt, text/plain">
 
             <!-- Ciphered Data Payload File Selector -->
@@ -2528,12 +2530,12 @@ async function w3decryptMLKEM() {
 
     // START: DISPLAY DRAWER ON-RAM DECRYPTED files
 
-    // Actually only images, video, audio and text
+    // Images, video, audio and text
 
        /* ADD files results to display into the w3-drawer
           Render only some specific mime types into the drawer:
           imageMimeTypes videoMimeTypes audioMimeTypes
-          and txt. PDFs can be opened directly in the browser by clicking the download link (instead of being saved) */
+          and txt. */
 
     // Drawer to display files content from RAM or only download links
 
@@ -3349,13 +3351,12 @@ async function bindOverlayRebuildLogic() {
 
 async function executeMldsaSignAndUpload() {
 
-
             let wpHostUrl = document.getElementById("w3RestHostUrl").value.trim();
             let senderUsername = document.getElementById("w3RestSenderUsername").value.trim();
             let encryptedBuffer = document.getElementById("w3RestPayloadFile").files;
             //let rawRecipientsString = document.getElementById("w3RestRecipientsInput").value;
             let dsaPrivKey = await w3RestMldsaPrivGet();
-            let baseUrl = wpHostUrl.replace(/\/$/, "");
+            let baseUrl = wpHostUrl.replace(/\/\$/, "");
             let btnUpload = document.getElementById("btnTriggerW3RestUpload");
             let originalText = btnUpload.innerText;
 
@@ -3426,7 +3427,7 @@ async function executeMldsaSignAndUpload() {
         progressText.innerText = "✒️ Computing ML-DSA handshake proof signature...";
         progressBarFill.style.width = "15%";
 
-            let challengeSignatureHex = "";
+        let challengeSignatureHex = "";
 
         if (dsaPrivKey && dsaPrivKey.length < 1) {
           throw new Error("Cryptographic Error: ML-DSA private key missing or unreadable.");
@@ -3440,168 +3441,166 @@ async function executeMldsaSignAndUpload() {
             throw new Error(`w3mypq Cryptographic Error: Expected a 4896-byte array, got length=${parsedDsaPrivKey.length}.`);
         }
 
-                // SECURITY FIX: Enforce the explicit domain separation context string
+        // SECURITY FIX: Enforce the explicit domain separation context string
         const handshakeCtx = new TextEncoder().encode("w3mypq-file-sig-v1");
 
         // ML-DSA signature generation is synchronous in noble-post-quantum
         // FIXED: Converted the string challenge parameter text into a clean binary Uint8Array
-         // SECURITY FIX: Re-align domain separation context strings to be fully portable with pure-PHP wrappers
+        // SECURITY FIX: Re-align domain separation context strings to be fully portable with pure-PHP wrappers
         // We concatenate the domain string and the random challenge string directly together!
         const isolatedMessageText = "w3mypq-file-sig-v1:" + randomChallengeText;
         const challengeBytes = new TextEncoder().encode(isolatedMessageText);
 
-        // ML-DSA signature generation is synchronous in noble-post-quantum
-        // Passed clean challengeBytes directly without the trailing context parameter block object
+        // SHIP TO WORKER
+        encryptionWorker = engineWorkerRestart();
 
+        encryptionWorker.postMessage({
+            action: 'MLDSA_SIGN',
+            challengeBytes: challengeBytes,
+            parsedDsaPrivKey: parsedDsaPrivKey
+        });
 
-    // SHIP TO WORKER
-    encryptionWorker = engineWorkerRestart();
+        encryptionWorker.onmessage = (e) => {
 
-    encryptionWorker.postMessage({
-        action: 'MLDSA_SIGN',
-        challengeBytes: challengeBytes,
-        parsedDsaPrivKey: parsedDsaPrivKey
-    });
+            if (e.data.type === 'DONE-DSA-SIGN') {
+                let signatureResult = e.data.result;
 
-    encryptionWorker.onmessage = (e) => {
+                (async () => {
+                    try {
+                        // Convert signature results to hexadecimal mapping strings for REST metadata transfers
+                        challengeSignatureHex = Array.from(new Uint8Array(signatureResult))
+                            .map(b => b.toString(16).padStart(2, '0'))
+                            .join('');
 
-    if (e.data.type === 'DONE-DSA-SIGN') {
-       //console.log('DONE-DSA-SIGN',e.data);
-       let signatureResult = e.data.result;
+                        // --- INITIALIZE CHUNKING ---
+                        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB bounds
+                        const totalBytes = encryptedPayloadBuffer.byteLength;
+                        const totalChunks = Math.ceil(totalBytes / CHUNK_SIZE);
+                        const uniqueUploadUuid = 'w3pq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
 
-    //console.log('signatureResult',signatureResult);
-    //console.log('e.data.result',e.data.result);
+                        // Construct our unified metadata package payload layout structure
+                        const transportMetadata = {
+                            sender: senderUsername,
+                            recipients: recipientArray,
+                            timestamp: Date.now(),
+                            total_chunks: totalChunks,
+                            upload_id: uniqueUploadUuid,
+                            handshake_text: randomChallengeText,     // The raw random challenge string
+                            handshake_sign: challengeSignatureHex   // The signature hex proof parameter
+                        };
 
-  (async () => {
-    try {
-        // Convert signature results to hexadecimal mapping strings for REST metadata transfers
-        challengeSignatureHex = Array.from(new Uint8Array(signatureResult))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
+                        // TRACKING ADDITION: Capture server state across chunk loop thresholds
+                        let activeW3SessionToken = "";
 
-        // --- INITIALIZE CHUNKING ---
-        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB bounds
-        const totalBytes = encryptedPayloadBuffer.byteLength;
-        const totalChunks = Math.ceil(totalBytes / CHUNK_SIZE);
-        const uniqueUploadUuid = 'w3pq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+                        console.log(`Starting chunked transfer session. Total chunks to route: ${totalChunks}`);
 
-        // Construct our unified metadata package payload layout structure
-        const transportMetadata = {
-            sender: senderUsername,
-            recipients: recipientArray,
-            timestamp: Date.now(),
-            total_chunks: totalChunks,
-            upload_id: uniqueUploadUuid,
-            handshake_text: randomChallengeText,     // The raw random challenge string
-            handshake_sign: challengeSignatureHex   // The signature hex proof parameter
-        };
+                        // --- SEQUENTIAL CHUNK TRANSMISSION LOOP ---
+                        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+                            const startByte = chunkIndex * CHUNK_SIZE;
+                            const endByte = Math.min(startByte + CHUNK_SIZE, totalBytes);
 
-        console.log(`Starting chunked transfer session. Total chunks to route: ${totalChunks}`);
+                            // Slice the binary buffer directly out from memory
+                            const chunkSliceBuffer = encryptedPayloadBuffer.slice(startByte, endByte);
 
-        // --- SEQUENTIAL CHUNK TRANSMISSION LOOP ---
-        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-            const startByte = chunkIndex * CHUNK_SIZE;
-            const endByte = Math.min(startByte + CHUNK_SIZE, totalBytes);
+                            // Calculate active progress bar metrics loading states tracking values
+                            const currentPercentage = Math.floor(20 + ((chunkIndex / totalChunks) * 75));
+                            progressText.innerText = `⏳ Uploading file block segment [${chunkIndex + 1}/${totalChunks}]...`;
+                            progressBarFill.style.width = `${currentPercentage}%`;
 
-            // Slice the binary buffer directly out from memory
-            const chunkSliceBuffer = encryptedPayloadBuffer.slice(startByte, endByte);
+                            // SECURITY UPDATE: Inject session tracking token if it has been captured on chunk 0
+                            if (chunkIndex > 0 && activeW3SessionToken !== "") {
+                                transportMetadata.w3_session_token = activeW3SessionToken;
+                            }
 
-            // Calculate active progress bar metrics loading states tracking values
-            const currentPercentage = Math.floor(20 + ((chunkIndex / totalChunks) * 75));
-            progressText.innerText = `⏳ Uploading file block segment [${chunkIndex + 1}/${totalChunks}]...`;
-            progressBarFill.style.width = `${currentPercentage}%`;
+                            const dataFormPayload = new FormData();
+                            const chunkBlob = new Blob([chunkSliceBuffer], { type: 'application/octet-stream' });
 
-            const dataFormPayload = new FormData();
-            const chunkBlob = new Blob([chunkSliceBuffer], { type: 'application/octet-stream' });
+                            // Append parameters blocks entries
+                            dataFormPayload.append('ciphered_payload', chunkBlob, 'segment_chunk.enc');
+                            dataFormPayload.append('metadata', JSON.stringify(transportMetadata));
+                            dataFormPayload.append('chunk_index', chunkIndex);
 
-            // Append parameters blocks entries
-            dataFormPayload.append('ciphered_payload', chunkBlob, 'segment_chunk.enc');
-            dataFormPayload.append('metadata', JSON.stringify(transportMetadata));
-            dataFormPayload.append('chunk_index', chunkIndex);
+                            // Post multipart form package straight onto our local WordPress host REST endpoints gateway
+                            const uploadResponse = await fetch(`${baseUrl}/wp-json/w3mypq/v1/share-payload`, {
+                                method: 'POST',
+                                body: dataFormPayload
+                            });
 
-       // Post multipart form package straight onto our local WordPress host REST endpoints gateway
-            const uploadResponse = await fetch(`${baseUrl}/wp-json/w3mypq/v1/share-payload`, {
-                method: 'POST',
-                body: dataFormPayload
-            });
+                            // DEBUG AT THE GATE
+                            const rawResponseText = await uploadResponse.text();
+                            console.log("Raw Server Response Text Context:", rawResponseText);
 
-            // DEBUG AT THE GATE
-            const rawResponseText = await uploadResponse.text();
-            console.log("Raw Server Response Text Context:", rawResponseText);
+                            if (!uploadResponse.ok) {
+                                 let errorMessage = "Unknown error";
 
-    if (!uploadResponse.ok) {
-         let errorMessage = "Unknown error";
+                                 try {
+                                   const errorData = JSON.parse(rawResponseText);
+                                   errorMessage = errorData.message;
+                                  } catch (e) {
+                                    errorMessage = rawResponseText;
+                                   }
 
-         try {
-          // Parse the text string
-           const errorData = JSON.parse(rawResponseText);
-           errorMessage = errorData.message;
-          } catch (e) {
-            // Fallback if the server response wasn't valid JSON text
-            errorMessage = rawResponseText;
-           }
+                              alert(`Server returned an error status [${uploadResponse.status}]: ${errorMessage}`);
+                              throw new Error(`Transmission breakdown on block chunk segment position reference index ID: ${chunkIndex}`);
+                            }
 
-      // Displays the actual cryptographic abort message instead of undefined
-      alert(`Server returned an error status [${uploadResponse.status}]: ${errorMessage}`);
+                            // Fallback evaluation
+                            let resultData;
+                            try {
+                                resultData = JSON.parse(rawResponseText);
+                            } catch(jsonErr) {
+                                console.error("Failed parsing server output. Raw body was:", rawResponseText);
+                                alert(`CRITICAL SERVER CRASH MESSAGE:\n\n${rawResponseText}`);
+                                throw jsonErr;
+                            }
 
-          throw new Error(`Transmission breakdown on block chunk segment position reference index ID: ${chunkIndex}`);
-    }
+                            // CAPTURE ADDITION: Save the returned transient token from chunk 0 for the remainder of the session loop
+                            if (chunkIndex === 0 && resultData.w3_session_token) {
+                                activeW3SessionToken = resultData.w3_session_token;
+                            }
 
-            // Fallback evaluation
-            let resultData;
-            try {
-                resultData = JSON.parse(rawResponseText);
-            } catch(jsonErr) {
-                console.error("Failed parsing server output. Raw body was:", rawResponseText);
-                alert(`CRITICAL SERVER CRASH MESSAGE:\n\n${rawResponseText}`);
-                throw jsonErr;
+                            // If the server completed full reassembly, it handles the closing response loops metrics
+                            if (resultData.status === 'success' && chunkIndex === totalChunks - 1) {
+
+                                progressBarFill.style.width = "100%";
+                                progressText.innerText = "🎉 Transmission completely processed!";
+
+                                btnUpload.disabled = false;
+                                btnUpload.innerText = originalText;
+
+                                if (resultData.warnings && resultData.warnings.length > 0) {
+                                    alert(`Package shared with warnings (unresolved targets): ${resultData.warnings.join(', ')}`);
+                                } else {
+                                    alert("🎉 Success! Your package has been chunk-uploaded, verified, and stored safely on the remote server host.");
+                                }
+
+                                progressContainer.style.display = "none";
+                                document.getElementById("w3HostOverlay").classList.remove("active");
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Chunked routing process failed:", error);
+                        alert(`Transaction failure breakdown: ${error.message}`);
+                        progressContainer.style.display = "none";
+                        btnUpload.disabled = false;
+                        btnUpload.innerText = originalText;
+                    }
+                    
+                })(); // (async () => { ... })() execution boundary close
+            } else {
+                throw new Error("DSA Signature Error");
+                console.log(e.data);
             }
-
-            // If the server completed full reassembly, it handles the closing response loops metrics
-            if (resultData.status === 'success' && chunkIndex === totalChunks - 1) {
-
-                progressBarFill.style.width = "100%";
-                progressText.innerText = "🎉 Transmission completely processed!";
-
-                btnUpload.disabled = false;
-                btnUpload.innerText = originalText;
-
-                if (resultData.warnings && resultData.warnings.length > 0) {
-                    alert(`Package shared with warnings (unresolved targets): ${resultData.warnings.join(', ')}`);
-                } else {
-                    alert("🎉 Success! Your package has been chunk-uploaded, verified, and stored safely on the remote server host.");
-                }
-
-                progressContainer.style.display = "none";
-                document.getElementById("w3HostOverlay").classList.remove("active");
-                return;
-            }
-        }
-       } catch (error) {
-         console.error("Chunked routing process failed:", error);
-         alert(`Transaction failure breakdown: ${error.message}`);
-         progressContainer.style.display = "none";
-         btnUpload.disabled = false;
-         btnUpload.innerText = originalText;
-        }
-       }
-  )(); // async END
- } else {
-        throw new Error("DSA Signature Error");
-        console.log(e.data);
-       }
-
- }
-} catch (error) {
+        }; // encryptionWorker.onmessage scope close
+    } catch (error) {
         console.error("Chunked routing process failed:", error);
         alert(`Transaction failure breakdown: ${error.message}`);
         progressContainer.style.display = "none";
         btnUpload.disabled = false;
         btnUpload.innerText = originalText;
     }
-}
-
-
+} // async function executeMldsaSignAndUpload() main body close
 
 
 async function w3RestMldsaPrivGet(){
@@ -4148,7 +4147,7 @@ document.addEventListener("DOMContentLoaded", () => {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.1 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.2 (C) 2026 axew3.com</h2>
 
 
 <noscript>
