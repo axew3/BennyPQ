@@ -13,7 +13,7 @@ w3myPQ Standalone Client Integration
  Y * - Military-Grade Encryption: AES-GCM-256 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.2
+ G * - Version 3.2.3
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -83,8 +83,11 @@ a:focus, a:hover, a:active {
 
 .mlkem-dsa-NOTloaded{
 }
-.mlkem-dsa-loaded,.mlkem-dsa-loaded-pub{
+.mlkem-dsa-loaded,.mlkem-dsa-loaded-pub,.greenH{
   color:#4BEA43;
+}
+.centerText{
+  text-align:center;
 }
 
 input::placeholder {
@@ -1313,6 +1316,7 @@ body .w3mypgp-trigger.ready {
             <!-- ML-DSA Private Key Input for Challenge Handshake Signing -->
             <div><label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Load ML-DSA Private Key</label></div>
             <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note</span> Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload:</label></div>
+            <div id="w3RestMldsaPrivLoaded" class="greenH centerText" style="padding:0;display:none;" class="cCenter">Private ML-DSA key loaded</div>
             <input type="file" id="w3RestMldsaPriv" accept=".txt, text/plain">
 
             <!-- Ciphered Data Payload File Selector -->
@@ -2273,6 +2277,13 @@ async function senderMldsaPrivLoad(){
       // Set loaded the class of priv-dsa-state
       document.getElementById("priv-dsa-state").className = "mlkem-dsa-loaded";
       document.getElementById("priv-dsa-state").innerHTML = "<b>Private ML-DSA sign key loaded</b>";
+
+      // Set visible/loaded the Rest key dsa state
+      document.getElementById("w3RestMldsaPrivLoaded").style.display = "block";
+      document.getElementById("w3RestMldsaPrivLoaded").style.fontWeight = "bold";
+      document.getElementById("w3RestMldsaPriv").style.color = "greenH";
+
+    
     }
    } catch (err) {
         return err;
@@ -3344,7 +3355,7 @@ async function bindOverlayRebuildLogic() {
  *
  * @param {string} wpHostUrl - Target WordPress root location
  * @param {string} senderUsername - Identity descriptor used to query profile keys
- * @param {ArrayBuffer} encryptedBuffer - Pre-signed binary package from BennyPQ
+ * @param {ArrayBuffer} encryptedBuffer - Binary package from BennyPQ or w3myPQ
  * @param {Array<string>} recipientArray - Clean targets allowed to access payload
  * @param {string|Uint8Array} dsaPrivKey - The user's ML-DSA Private Key for challenge signing
  */
@@ -3575,7 +3586,8 @@ async function executeMldsaSignAndUpload() {
                                 }
 
                                 progressContainer.style.display = "none";
-                                document.getElementById("w3HostOverlay").classList.remove("active");
+                                // Close immediately after the transfer finish
+                                //document.getElementById("w3HostOverlay").classList.remove("active");
                                 return;
                             }
                         }
@@ -3605,6 +3617,7 @@ async function executeMldsaSignAndUpload() {
 
 async function w3RestMldsaPrivGet(){
 
+
    try{
     if(document.getElementById('w3RestMldsaPriv')?.files?.length > 0){
       let k = document.getElementById("w3RestMldsaPriv").files[0];
@@ -3619,6 +3632,8 @@ async function w3RestMldsaPrivGet(){
 
       if(document.getElementById('w3RestMldsaPriv')) {
           document.getElementById('w3RestMldsaPriv').value = null;
+          document.getElementById('w3RestMldsaPrivLoaded').setAttribute("style", "display:block;");
+          
       }
 
       if(document.getElementById("priv-dsa-state")) {
@@ -4147,7 +4162,7 @@ document.addEventListener("DOMContentLoaded", () => {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.2 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.3 (C) 2026 axew3.com</h2>
 
 
 <noscript>
