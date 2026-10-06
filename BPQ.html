@@ -13,7 +13,7 @@ w3myPQ Standalone Client Integration
  Y * - Military-Grade Encryption: AES-GCM-256 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.4
+ G * - Version 3.2.5
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -542,6 +542,9 @@ display:none;
 display:none;
 }
 
+#overlay-dynamic-content{
+ margin-bottom:20px;
+}
 
 #overlay-dynamic-content > h2{
  font-size: 2.0rem;
@@ -3301,6 +3304,10 @@ async function bindOverlayRebuildLogic() {
                     uPrivateKeyMldsa = completeKeyString;
                     document.getElementById("priv-dsa-state").className = "mlkem-dsa-loaded";
                     document.getElementById("priv-dsa-state").textContent = "Private ML-DSA sign key loaded";
+                    // Set also the REST ml-dsa as loaded
+                    document.getElementById("w3RestMldsaPrivLoaded").style.display = "block";
+                    document.getElementById("w3RestMldsaPrivLoaded").style.fontWeight = "bold";
+                    document.getElementById("w3RestMldsaPriv").style.color = "greenH";
                 } else if (keySizeInBytes === 3168) {
                     whicKey = 2; // ML-KEM-1024
                     uPrivateKeyMlkemLoaded = myprivKey = completeKeyString;
@@ -3319,7 +3326,7 @@ async function bindOverlayRebuildLogic() {
                 workspaceArea.innerHTML = keyIS +
                     "<p style='color:#94a3b8; font-size:0.95rem; text-align:center;'>Your key has been fully reconstructed with standard boundaries.</p>" +
                     "<div style='display:flex; flex-direction:column; gap:8px; width:100%;'>" +
-                        "<textarea id='overlay-copy-key-box' style='width:100%; height:140px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:8px; padding:12px; font-family:monospace; resize:none;' readonly></textarea>" +
+                        "<textarea id='overlay-copy-key-box' style='width:90%; height:140px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:8px; padding:12px; font-family:monospace; resize:none;' readonly></textarea>" +
                     "</div>" +
                     "<button id='overlay-copy-btn' style='background:#334155; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:5px;'>Copy to Clipboard</button>" +
                     "<button id='overlay-download-key-btn' style='background:#0ea5e9; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; margin-top:10px;'>Download .txt Key File</button>";
@@ -4180,7 +4187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.4 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.5 (C) 2026 axew3.com</h2>
 
 
 <noscript>
