@@ -13,7 +13,7 @@ w3myPQ Standalone Client Integration
  Y * - Military-Grade Encryption: AES-GCM-256 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.3
+ G * - Version 3.2.4
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -1318,6 +1318,18 @@ body .w3mypgp-trigger.ready {
             <div><label class="cText w3blank" style="display: block; margin-bottom: 5px; font-size:55%"><span class="highL">Note</span> Provide the correct ML-DSA-87 Private key —the one corresponding to the Public key saved on the user profile of the website receiving the shared payload:</label></div>
             <div id="w3RestMldsaPrivLoaded" class="greenH centerText" style="padding:0;display:none;" class="cCenter">Private ML-DSA key loaded</div>
             <input type="file" id="w3RestMldsaPriv" accept=".txt, text/plain">
+
+            <!-- Chunk Size Selection Dropdown -->
+            <div class="cCenterD" style="margin: 15px 0;">
+             <label for="bpqChunkSize" style="color: #00d2ff; font-weight: bold; font-size: 1.4rem;">Upload Chunk Size: </label>
+             <select id="bpqChunkSize" style="background: #191919; color: #fff; border: 2px solid #3B4568; border-radius: 8px; padding: 8px 12px; font-family: monospace; font-size: 1.2rem; cursor: pointer;">
+              <option value="1">1 MB (Best for slow/strict servers)</option>
+              <option value="2" selected>2 MB (Default balanced)</option>
+              <option value="5">5 MB (Fast on good hosting)</option>
+              <option value="10">10 MB (Maximum speed)</option>
+             </select>
+            </div>
+
 
             <!-- Ciphered Data Payload File Selector -->
             <label class="cText" style="display: block; margin-top: 20px; margin-bottom: 5px;">Select Encrypted File</label>
@@ -3484,7 +3496,13 @@ async function executeMldsaSignAndUpload() {
                             .join('');
 
                         // --- INITIALIZE CHUNKING ---
-                        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB bounds
+                        //const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB bounds
+                        // Get the user MB upload choice
+                    const chunkSizeSelect = document.getElementById('bpqChunkSize');
+                    const selectedMB = chunkSizeSelect ? parseInt(chunkSizeSelect.value, 10) : 2; // Fallback to 2MB if element missing
+ 
+                    const CHUNK_SIZE = selectedMB * 1024 * 1024; 
+
                         const totalBytes = encryptedPayloadBuffer.byteLength;
                         const totalChunks = Math.ceil(totalBytes / CHUNK_SIZE);
                         const uniqueUploadUuid = 'w3pq_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
@@ -4162,7 +4180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.3 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.4 (C) 2026 axew3.com</h2>
 
 
 <noscript>
