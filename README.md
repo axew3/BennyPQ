@@ -63,8 +63,6 @@ To eliminate risks from compromised servers, users can leverage the **BennyPQ** 
 
 ## 🤝 Credits
 
-Powered by a compiled version of the authoritative [Noble post-quantum](https://github.com/paulmillr/noble-post-quantum) cryptography libraries for ML-KEM and ML-DSA.
-
 Developed by **axew3** — [axew3.com](https://axew3.com)
 
 Copyright (c) 2026 axew3
