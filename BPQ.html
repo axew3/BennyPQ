@@ -13,7 +13,7 @@ w3myPQ Standalone Client Integration
  Y * - Military-Grade Encryption: AES-GCM-256 (for Hashing/Integrity).
  R * - NIST 5 level encryption.
  I * - Online working example: https://www.axew3.com/www/deApps/BPQ/BennyPQ.html
- G * - Version 3.2.7
+ G * - Version 3.2.8
  H * - Using the compiled Noble PQ library 0.7.1 embedded within this same file
  T * - https://github.com/paulmillr/noble-post-quantum
 
@@ -2647,6 +2647,16 @@ async function w3decryptMLKEM() {
     reader.readAsDataURL(new Blob([fileObj.data], { type: mime }));
 
      } else if (file_ext === 'txt') {
+     	
+     	
+       const MAX_SIZE = 1048576; // TXT 1MB max for the Drawer
+       // TODO: check for files dimension for the Drawer need be added for all files
+       // avoid possible browser freezing when the text file is too big
+
+       if (fileObj.size > MAX_SIZE) {
+        alert("Error: text file too large! Maximum allowed size is 1 MB for the Drawer. Only the file download is available.");
+        continue;
+       }
 
        // TXT
             someFileIsForDrawer = true;
@@ -4191,7 +4201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         font-weight: 900;
         letter-spacing: -0.03em;
         color:#000000;
-        margin:0;">3.2.7 (C) 2026 axew3.com</h2>
+        margin:0;">3.2.8 (C) 2026 axew3.com</h2>
 
 
 <noscript>
